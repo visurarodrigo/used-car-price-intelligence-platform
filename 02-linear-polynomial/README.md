@@ -1,40 +1,41 @@
-## 🚗 Used Cars Price Prediction: Linear vs Polynomial Regression
+# Stage 02: Baseline Regression Modeling
 
-This project focuses on modeling used car prices using **Linear** and **Polynomial Regression** techniques.
+This folder is **Stage 2** of the full **Used Car Price Intelligence Platform** project.
 
-### Objectives
+## Purpose
 
-- Explore the relationship between car attributes (e.g., engine size, highway-mpg, horsepower) and price.
-- Build and compare:
-  - 📐 **Simple Linear Regression**
-  - 📈 **Polynomial Regression**
-- Evaluate model performance using **R² Score** and **Mean Squared Error (MSE)**.
-- Visualize fitted values vs actual price data.
+Establish and compare baseline regression models for price prediction:
+- Start with a simple linear baseline
+- Test polynomial regression for non-linear relationships
+- Compare performance using consistent metrics
 
-### Technologies Used
+## What This Stage Covers
 
-- Python 3 
-- Jupyter Notebook 
-- Libraries:
-  - `pandas`, `numpy`
-  - `matplotlib`, `seaborn`
-  - `sklearn` (scikit-learn)
+- Simple Linear Regression using key predictors
+- Polynomial Regression (degree 2)
+- Multi-feature polynomial pipeline
+- Model comparison with R-squared and MSE
+- Visual comparison of fitted vs actual behavior
 
-### 📂 Files
+## Files
 
-| File | Description |
-|------|-------------|
-| `Used-Cars-Price-Prediction.ipynb` | Jupyter notebook with full implementation |
-| `README.md` | Project overview |
-| `Plots` | Saved charts and plots |
-| `usedcars.csv` | Data Set |
+- `Used Cars Price Prediction.ipynb` - Main notebook for baseline model comparison
+- `Linear Regression - Engine Size vs Price.png`
+- `Polynomial Regression (Degree 2).png`
+- `Distribution - Actual vs Predicted (Linear Regression.png`
 
-### 📊 Key Insights
+## Dataset
 
-- Polynomial regression provided a better fit for non-linear data trends.
-- Pipelines simplified model building with multiple steps.
-- Visualization helped interpret model predictions effectively.
+- Shared dataset path: `../data/usedcars.csv`
+- Uses the same data foundation prepared in Stage 1
 
-Author - Visura Rodrigo
+## How to Run
 
-Course - IBM: Data Analysis with Python
+1. Install dependencies:
+   `pip install pandas numpy matplotlib seaborn scikit-learn jupyter`
+2. Open and run:
+   `Used Cars Price Prediction.ipynb`
+
+## Author
+
+Visura Rodrigo

@@ -1,52 +1,45 @@
-# Used Car Price Prediction
+# Stage 03: Model Refinement and Evaluation
 
-## 📖 Project Overview
-This project predicts the selling price of used cars based on various features such as mileage, year, brand, fuel type, and more.  
-The model is built and refined using regression techniques including Linear Regression, Polynomial Features, Ridge Regression, and hyperparameter tuning with Grid Search.  
+This folder is **Stage 3** of the full **Used Car Price Intelligence Platform** project.
 
-The goal is to create an accurate and reliable price prediction model while demonstrating key data analysis and machine learning concepts from the **IBM Data Analysis with Python** course.
+## Purpose
 
----
+Improve baseline models into a more reliable predictive solution by focusing on:
+- Better generalization
+- Hyperparameter tuning
+- Validation quality
+- Error analysis
 
-## 🛠️ Key Steps
+## What This Stage Covers
 
-1. Data Loading & Cleaning  
-2. Exploratory Data Analysis (EDA)  
-3. Train/Test Data Splitting  
-4. Baseline Linear Regression Modeling  
-5. Cross-Validation for Model Reliability  
-6. Polynomial Feature Engineering + Ridge Regression  
-7. Hyperparameter Tuning with Grid Search  
-8. Model Evaluation with R² and MSE  
-9. Visualization of Predicted vs Actual Prices and Residuals  
+- Data preprocessing and train/test split
+- Baseline linear model reference
+- Cross-validation for stability checks
+- Polynomial feature expansion + Ridge regularization
+- Grid Search to tune Ridge `alpha`
+- Final evaluation with R-squared, MSE, and residual diagnostics
 
+## Files
 
-## 📁 Files in This Repository
+- `Used Car Price Prediction.ipynb` - Main refinement and evaluation notebook
+- `Predicted vs Actual Car Prices.png` - Prediction fit visualization
+- `Residual Plot.png` - Error pattern analysis
 
-- `Used Car Price Prediction.ipynb` — Jupyter notebook containing full analysis and model building steps  
-- `usedcars.csv` — Dataset used for training and testing  
-- `Prediction vs Actual Car Prices.png` — Scatter plot visualization  
-- `Residual Plot.png` — Residual error plot  
+## Dataset
 
----
+- Shared dataset path: `../data/usedcars.csv`
+- Continues from the same data and feature context as Stages 1 and 2
 
-## 🚀 How to Run
+## How to Run
 
-1. Clone or download this repository  
-2. Open the Jupyter notebook file (`Used Car Price Prediction.ipynb`) in JupyterLab or Jupyter Notebook  
-3. Ensure you have the required Python libraries installed:
-    - pandas
-    - numpy
-    - matplotlib
-    - scikit-learn
-4. Run each cell sequentially to reproduce the data cleaning, model training, tuning, and evaluation process  
+1. Install dependencies:
+    `pip install pandas numpy matplotlib seaborn scikit-learn jupyter`
+2. Open and run:
+    `Used Car Price Prediction.ipynb`
 
----
+## Author
 
-##### 📚 About the Author
-
-**Visura Rodrigo** — Undergraduate University Student passionate about data science and machine learning.  
-This project is part of the IBM Data Analysis with Python.
+Visura Rodrigo
 
 
 

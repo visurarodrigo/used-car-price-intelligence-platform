@@ -1,375 +1,110 @@
-# 🚗 Used Car Price Intelligence Platform
+﻿# Used Car Price Intelligence Platform
 
-A comprehensive **end-to-end machine learning project** that predicts used car prices using progressively sophisticated regression techniques. This portfolio project demonstrates the complete data science workflow: from exploratory analysis through baseline modeling to advanced hyperparameter optimization.
+End-to-end machine learning project for used car price prediction using exploratory analysis, baseline regression, and refined model optimization.
 
----
+## Project Overview
 
-## 📌 Project Overview
+This repository presents one unified project that moves through three connected stages:
+- `01-eda`: exploratory data analysis and visual insights
+- `02-linear-polynomial`: baseline linear vs polynomial regression modeling
+- `03-model-refinement`: model improvement with validation and regularization
 
-This project builds an intelligent price prediction system for used cars by analyzing vehicle features and market patterns. Through three integrated stages, the project evolves from fundamental data exploration to a production-ready regression model.
+Dataset summary:
+- 201 records
+- 29 features
+- Target: `price`
+- Shared dataset path: `data/usedcars.csv`
 
-**Dataset**: 201 used car listings with 29 features (engine specs, dimensions, performance metrics, and pricing data)
+## Business Problem
 
-**Target Variable**: Car selling price
+Used car pricing is difficult due to:
+- Non-linear relationships between vehicle features and price
+- Risk of underpricing (lost margin)
+- Risk of overpricing (slower sales)
 
-**Core Achievement**: Achieved **R² = 0.828** (82.8% variance explained) using polynomial feature engineering and Ridge regularization.
+This project builds a data-driven pricing approach to support more consistent and explainable valuation.
 
----
+## Key Features / What This Project Does
 
-## 🎯 Business Problem
+- Performs structured EDA to identify major price drivers
+- Compares baseline regression approaches
+- Builds improved models with polynomial features and Ridge regularization
+- Uses cross-validation and error metrics for robust evaluation
+- Organizes work into clear stage-based notebooks for reproducibility
 
-Used car dealerships and private sellers face significant challenges in pricing vehicles competitively:
-- **Underpricing** leads to lost revenue
-- **Overpricing** makes vehicles difficult to sell
-- **Market variability** requires data-driven valuation
-- **Feature relationships** are non-linear and complex
+## Project Structure
 
-This project develops a data-driven pricing model that accounts for multiple vehicle attributes and their interactions, enabling accurate price predictions and market insights.
-
----
-
-## 🎓 Objectives
-
-1. **Understand Market Dynamics**: Conduct comprehensive exploratory analysis to identify key price drivers and feature relationships
-2. **Compare Baseline Models**: Evaluate simple linear and polynomial regression approaches to establish baseline performance
-3. **Optimize Predictions**: Build advanced models using regularization, feature engineering, and hyperparameter tuning
-4. **Evaluate Robustness**: Apply cross-validation and residual analysis to ensure model reliability
-5. **Document Insights**: Clearly communicate methods, findings, and performance metrics for reproducibility
-
----
-
-## 🔄 Project Workflow
-
-This project is organized into **three progressive stages**, each building upon the previous:
-
-### **Stage 1: Exploratory Data Analysis (01-eda/)**
-- Dataset overview and data quality assessment
-- Univariate analysis of numerical and categorical features
-- Bivariate relationships and correlation analysis
-- Feature distributions and outlier identification
-- **Output**: Comprehensive visualizations and feature insights
-
-### **Stage 2: Baseline Regression Models (02-linear-polynomial/)**
-- Simple Linear Regression (single feature)
-- Polynomial Regression (degree 2, single feature)
-- Multi-feature Polynomial Pipeline (degree 2, 3 features)
-- Model comparison using R² and MSE metrics
-- **Output**: Baseline performance benchmarks and algorithm comparison
-
-### **Stage 3: Model Refinement & Optimization (03-model-refinement/)**
-- Data preprocessing with one-hot encoding and normalization
-- Train-test split (90-10 split)
-- Baseline Linear Regression establishment
-- Cross-validation (4-fold) for reliability
-- Advanced Pipeline: StandardScaler → PolynomialFeatures → Ridge Regression
-- Grid Search hyperparameter tuning (Ridge alpha optimization)
-- Final model evaluation with residual analysis
-- **Output**: Production-ready model with verified performance metrics
-
----
-
-## 📁 Repository Structure
-
-```
+```text
 used-car-price-intelligence-platform/
-├── README.md                           # This file
-├── data/
-│   └── usedcars.csv                   # Centralized dataset (201 cars, 29 features)
-│
-├── 01-eda/                            # STAGE 1: Exploratory Data Analysis
-│   ├── EDA - UsedCars.ipynb          # Main EDA notebook
-│   ├── README.md                     # Stage-specific documentation
-│   ├── boxplots-categorical/         # Box plots (categorical vs price)
-│   ├── regression-plots/             # Scatter plots with trend lines
-│   ├── Average Price by Drive Wheels And Body Style.png
-│   ├── Categorical Variable Distributions.png
-│   ├── Correlation Matrix of Numerical Features.png
-│   └── Histograms of Numerical Features.png
-│
-├── 02-linear-polynomial/             # STAGE 2: Baseline Model Comparison
-│   ├── Used Cars Price Prediction.ipynb    # Regression comparison notebook
-│   ├── README.md                           # Stage-specific documentation
-│   ├── Linear Regression - Engine Size vs Price.png
-│   ├── Polynomial Regression (Degree 2).png
-│   └── Distribution - Actual vs Predicted (Linear Regression.png
-│
-└── 03-model-refinement/              # STAGE 3: Advanced Optimization
-    ├── Used Car Price Prediction.ipynb    # Model refinement notebook
-    ├── README.md                          # Stage-specific documentation
-    ├── Predicted vs Actual Car Prices.png
-    └── Residual Plot.png
+|-- README.md
+|-- data/
+|   `-- usedcars.csv
+|-- 01-eda/
+|   |-- EDA - UsedCars.ipynb
+|   |-- boxplots-categorical/
+|   `-- regression-plots/
+|-- 02-linear-polynomial/
+|   `-- Used Cars Price Prediction.ipynb
+`-- 03-model-refinement/
+    `-- Used Car Price Prediction.ipynb
 ```
 
----
-
-## 🔬 Methods & Techniques
-
-### **Exploratory Data Analysis**
-- Missing value detection and handling
-- Descriptive statistics and data profiling
-- Distribution analysis (histograms, density plots)
-- Correlation and relationship analysis
-- Categorical variable investigation
-- Outlier identification
-
-### **Feature Engineering**
-- One-hot encoding for categorical variables
-- Polynomial feature expansion (degree 2)
-- Feature scaling and normalization
-- Mean imputation for missing values
-
-### **Regression Algorithms**
-- **Linear Regression**: Baseline model for linear relationships
-- **Polynomial Regression**: Captures non-linear patterns
-- **Ridge Regression (L2)**: Regularization to prevent overfitting
-- **Pipeline Architecture**: Combines preprocessing → feature engineering → modeling
-
-### **Model Optimization**
-- Train-test stratification (90-10 split)
-- K-fold Cross-Validation (k=4) for reliability
-- Grid Search for hyperparameter tuning
-- Ridge alpha parameter optimization: [0.001, 0.01, 0.1, 1, 10, 100]
-
-### **Validation & Evaluation**
-- R² Score (coefficient of determination)
-- Mean Squared Error (MSE)
-- Residual analysis for error patterns
-- Actual vs. Predicted visualization
-- Cross-validation consistency checks
-
----
-
-## 📊 Results Summary
-
-### **Model Performance Comparison**
-
-| Model | Features | R² Score | MSE | Notes |
-|-------|----------|----------|-----|-------|
-| Simple Linear | 1 (engine-size) | 0.761 | 15,021,126 | Baseline reference |
-| Polynomial (Deg 2) | 1 (engine-size) | 0.761 | 15,016,547 | Minimal improvement, single feature limitation |
-| Multi-feature Polynomial | 3 (engine-size, horsepower, highway-mpg) | 0.828 | 10,819,563 | 🏆 **Best Performance** |
-| Ridge + Polynomial | 25+ engineered | ~0.83+ | Lower | Production-ready, regularized |
-
-### **Key Insights**
-
-1. **Non-linear Relationships**: Price exhibits quadratic relationship with engine size; polynomial models substantially outperform linear approaches
-2. **Multi-feature Advantage**: Additional relevant features dramatically improve predictions (~8.7% R² improvement)
-3. **Feature Importance**: Engine size, horsepower, and highway MPG are the strongest price predictors
-4. **Model Stability**: Ridge regularization prevents overfitting on high-dimensional feature space
-5. **Error Distribution**: Residuals show relatively random patterns, indicating good model assumptions
-
-### **Best Model Specifications**
-- **Algorithm**: Ridge Regression with Polynomial Features
-- **Preprocessing**: StandardScaler + PolynomialFeatures(degree=2)
-- **Regularization**: Ridge alpha = (via GridSearch optimization)
-- **Validation**: 4-fold cross-validation
-- **Performance**: R² = 0.828, MSE = 10.8M
-
----
-
-## 🛠️ Tools & Technologies
-
-### **Programming Languages**
-- Python 3.x
-
-### **Core Libraries**
-- **Data Processing**: `pandas`, `numpy`
-- **Visualization**: `matplotlib`, `seaborn`
-- **Machine Learning**: `scikit-learn`
-  - LinearRegression, Ridge, PolynomialFeatures
-  - Pipeline, GridSearchCV, cross_val_score
-  - train_test_split, StandardScaler
-  - mean_squared_error, r2_score
-
-### **Development Environment**
-- Jupyter Notebook
-- Git (version control with full commit history)
-
-### **Data Format**
-- CSV (comma-separated values)
-
----
-
-## 🚀 Getting Started
-
-### **Prerequisites**
-- Python 3.7 or higher
-- pip (Python package manager)
-
-### **Installation**
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/used-car-price-intelligence-platform.git
-   cd used-car-price-intelligence-platform
-   ```
-
-2. **Create a virtual environment (optional but recommended)**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install pandas numpy matplotlib seaborn scikit-learn jupyter
-   ```
-
-### **Running the Notebooks**
-
-1. **Start Jupyter Notebook**
-   ```bash
-   jupyter notebook
-   ```
-
-2. **Follow the recommended workflow** (in order):
-   
-   **📌 Stage 1 - EDA (Foundation)**
-   - Open: `01-eda/EDA - UsedCars.ipynb`
-   - Run all cells to explore the dataset
-   - Review generated visualizations
-   
-   **📌 Stage 2 - Model Comparison (Learning)**
-   - Open: `02-linear-polynomial/Used Cars Price Prediction.ipynb`
-   - Compare linear vs. polynomial approaches
-   - Understand performance differences
-   
-   **📌 Stage 3 - Advanced Optimization (Production)**
-   - Open: `03-model-refinement/Used Car Price Prediction.ipynb`
-   - Build regularized models
-   - Review hyperparameter tuning results
-
-3. **Dataset Location**
-   - All notebooks automatically load from: `../data/usedcars.csv`
-   - No manual path changes needed
-
-### **Expected Runtime**
-- EDA notebook: ~2-3 minutes (includes visualizations)
-- Baseline models: ~1-2 minutes
-- Advanced models: ~2-3 minutes (includes GridSearch)
-
----
-
-## 📈 Future Improvements
-
-### **Advanced Machine Learning**
-- [ ] Ensemble methods (Random Forest, Gradient Boosting, XGBoost)
-- [ ] Neural networks (TensorFlow/Keras)
-- [ ] Support Vector Regression (SVR)
-- [ ] Stacking and voting ensembles
-- [ ] AutoML exploration
-
-### **Feature Enhancement**
-- [ ] Interaction term analysis
-- [ ] Domain-specific feature engineering
-- [ ] Feature selection with RFE or SelectKBest
-- [ ] Handling categorical variables with target encoding
-
-### **Data Expansion**
-- [ ] Increase dataset to 500+ samples
-- [ ] Add temporal data (year, seasons)
-- [ ] Incorporate regional/market data
-- [ ] Include maintenance history and service records
-- [ ] Add accident/damage history when available
-
-### **Production Readiness**
-- [ ] API development (Flask/FastAPI)
-- [ ] Web dashboard (Streamlit/Plotly)
-- [ ] Model persistence (joblib/pickle)
-- [ ] Model versioning and tracking
-- [ ] Automated retraining pipeline
-- [ ] Docker containerization
-- [ ] CI/CD deployment
-
-### **Robustness & Validation**
-- [ ] Confidence intervals for predictions
-- [ ] Uncertainty quantification
-- [ ] Out-of-sample performance testing
-- [ ] Edge case analysis
-- [ ] Anomaly detection for outlier vehicles
-
----
-
-## 📚 Learning Outcomes
-
-This project demonstrates proficiency in:
-
-✅ **Data Science Fundamentals**
-- Exploratory data analysis and visualization
-- Feature engineering and preprocessing
-- Statistical analysis and interpretation
-
-✅ **Machine Learning**
-- Regression modeling and algorithm selection
-- Hyperparameter tuning and optimization
-- Cross-validation and model evaluation
-- Regularization techniques
-
-✅ **Python Development**
-- Pandas for data manipulation
-- Scikit-learn for ML pipelines
-- Jupyter notebooks for reproducible analysis
-- Version control with Git
-
-✅ **Communication**
-- Clear documentation and commenting
-- Visualization storytelling
-- Professional presentation of results
-
----
-
-## 📖 How to Use This Project
-
-**For Learning**:
-- Work through each stage sequentially
-- Study the code comments and markdown explanations
-- Try modifying parameters and observe results
-- Experiment with different regression algorithms
-
-**For Portfolio**:
-- Reference this as an end-to-end ML project
-- Highlight the progression from basics to advanced techniques
-- Discuss the business problem and real-world applicability
-- Explain the choice of methods and evaluation metrics
-
-**For Reference**:
-- Use as a template for similar regression projects
-- Adapt the notebook structure for other domains
-- Reference the pipeline architecture patterns
-
----
-
-## 👤 Author
-
-**Visura Rodrigo**  
-Data Science Enthusiast | Machine Learning Developer  
-
-This project is built upon learnings from the **IBM Data Analysis with Python** course, extended and refactored into a comprehensive portfolio project.
-
----
-
-## 📝 Acknowledgments
-
-- Dataset sourced from used car market research
-- IBM Data Analysis with Python course for foundational concepts
-- Scikit-learn documentation for model implementations
-- Open-source Python community for excellent data science tools
-
----
-
-## 📧 Contact & Support
-
-For questions, suggestions, or collaboration opportunities:
-- GitHub Issues: [Create an issue](../../issues)
-- Email: [your-email@example.com]
-
----
-
-## 📄 License
-
-This project is provided as-is for educational and portfolio purposes.
-
----
-
-**Last Updated**: March 29, 2026  
-**Status**: ✅ Complete and Production-Ready
+## Methods & Models Used
+
+- Data analysis: descriptive statistics, correlation analysis, distribution and category plots
+- Feature engineering: one-hot encoding, polynomial feature expansion, scaling
+- Models:
+  - Linear Regression
+  - Polynomial Regression
+  - Ridge Regression
+- Validation:
+  - Train/test split
+  - 4-fold cross-validation
+  - Grid search for Ridge `alpha`
+- Metrics: R-squared, Mean Squared Error (MSE), residual analysis
+
+## Results / Insights
+
+Model comparison highlights:
+- Linear Regression (single feature): R2 = 0.761, MSE = 15,021,126
+- Polynomial Regression (single feature): R2 = 0.761, MSE = 15,016,547
+- Polynomial Pipeline (3 features): R2 = 0.828, MSE = 10,819,563
+
+Key takeaways:
+- Non-linear modeling improved fit over a basic linear baseline
+- Multi-feature modeling significantly increased predictive performance
+- Regularization and validation improved model reliability
+
+## How to Run
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/used-car-price-intelligence-platform.git
+cd used-car-price-intelligence-platform
+```
+
+2. Install dependencies
+```bash
+pip install pandas numpy matplotlib seaborn scikit-learn jupyter
+```
+
+3. Launch notebooks
+```bash
+jupyter notebook
+```
+
+4. Run in sequence:
+- `01-eda/EDA - UsedCars.ipynb`
+- `02-linear-polynomial/Used Cars Price Prediction.ipynb`
+- `03-model-refinement/Used Car Price Prediction.ipynb`
+
+## Future Improvements
+
+- Add ensemble models (Random Forest, XGBoost)
+- Expand dataset size and feature coverage
+- Expose model through an API or lightweight dashboard
+- Add model versioning and automated retraining pipeline
+
+## Author
+
+Visura Rodrigo
