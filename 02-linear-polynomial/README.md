@@ -1,39 +1,45 @@
-# Stage 02: Baseline Regression Modeling
+# Stage 02: Professional Regression Benchmark
 
-This folder is **Stage 2** of the full **Used Car Price Intelligence Platform** project.
+This folder is **Stage 2** of the **Used Car Price Intelligence Platform** project.
 
 ## Purpose
 
-Establish and compare baseline regression models for price prediction:
-- Start with a simple linear baseline
-- Test polynomial regression for non-linear relationships
-- Compare performance using consistent metrics
+Build a regression benchmark pipeline that compares multiple model families and selects the best candidate for downstream stages.
 
 ## What This Stage Covers
 
-- Simple Linear Regression using key predictors
-- Polynomial Regression (degree 2)
-- Multi-feature polynomial pipeline
-- Model comparison with R-squared and MSE
-- Visual comparison of fitted vs actual behavior
+- Robust data loading and numeric conversion from `../data/usedcars.csv`
+- Automated train/test split with 5-fold cross-validation
+- Model comparison :
+  - Linear Regression
+  - Ridge Regression
+  - Lasso Regression
+  - ElasticNet Regression
+  - Polynomial Regression (degree 2)
+  - Polynomial Regression (degree 3)
+  - Random Forest Regressor
+  - Gradient Boosting Regressor
+- Standardized evaluation with R2, RMSE, and MAE
+- Automatic best-model selection
+- Artifact persistence for plots, metrics, and serialized model
+
+## Output Structure
+
+All generated outputs are saved automatically to:
+
+- `outputs/figures/`
+- `outputs/metrics/`
+- `outputs/models/`
 
 ## Files
 
-- `Used Cars Price Prediction.ipynb` - Main notebook for baseline model comparison
-- `Linear Regression - Engine Size vs Price.png`
-- `Polynomial Regression (Degree 2).png`
-- `Distribution - Actual vs Predicted (Linear Regression.png`
-
-## Dataset
-
-- Shared dataset path: `../data/usedcars.csv`
-- Uses the same data foundation prepared in Stage 1
+- `Used Cars Price Prediction.ipynb` - Main Stage 02 benchmark notebook
 
 ## How to Run
 
 1. Install dependencies:
-   `pip install pandas numpy matplotlib seaborn scikit-learn jupyter`
-2. Open and run:
+   `pip install pandas numpy matplotlib seaborn scikit-learn joblib jupyter`
+2. Open and run all cells in:
    `Used Cars Price Prediction.ipynb`
 
 ## Author
