@@ -1,36 +1,71 @@
 ﻿# Used Car Price Intelligence Platform
 
-End-to-end machine learning project for used car price prediction using exploratory analysis, baseline regression, and refined model optimization.
+End-to-end machine learning project for used car price prediction, structured as a professional 3-stage workflow from analysis to refined modeling.
 
 ## Project Overview
 
-This repository presents one unified project that moves through three connected stages:
-- `01-eda`: exploratory data analysis and visual insights
-- `02-linear-polynomial`: baseline linear vs polynomial regression modeling
-- `03-model-refinement`: model improvement with validation and regularization
+This repository contains one connected pipeline across three stages:
+
+- `01-eda`: exploratory data analysis, quality checks, and feature-target insights
+- `02-baseline-modeling`: multi-model benchmark and best-model selection
+- `03-model-refinement`: regularized refinement, tuning, and diagnostic evaluation
 
 Dataset summary:
-- 201 records
-- 29 features
+
+- Records: 201
+- Features: 29
 - Target: `price`
-- Shared dataset path: `data/usedcars.csv`
+- Shared dataset: `data/usedcars.csv`
 
 ## Business Problem
 
-Used car pricing is difficult due to:
-- Non-linear relationships between vehicle features and price
-- Risk of underpricing (lost margin)
-- Risk of overpricing (slower sales)
+Used car valuation is challenging because market price is influenced by many non-linear factors (vehicle specs, condition proxies, and category-level effects). Incorrect pricing creates two major risks:
 
-This project builds a data-driven pricing approach to support more consistent and explainable valuation.
+- Underpricing: loss of revenue/margin
+- Overpricing: slower inventory movement
 
-## Key Features / What This Project Does
+This project builds a data-driven pricing intelligence workflow to improve consistency, transparency, and predictive accuracy.
 
-- Performs structured EDA to identify major price drivers
-- Compares baseline regression approaches
-- Builds improved models with polynomial features and Ridge regularization
-- Uses cross-validation and error metrics for robust evaluation
-- Organizes work into clear stage-based notebooks for reproducibility
+## Stage Summary
+
+### Stage 01 - EDA
+
+- Data quality checks: missing values, duplicates, dtypes
+- Univariate and bivariate visual exploration
+- Numerical and categorical behavior vs `price`
+- Correlation and outlier-focused inspection
+- Exported visuals in a structured output layout
+
+### Stage 02 - Baseline Modeling
+
+- Benchmarked model families:
+  - Linear Regression
+  - Ridge Regression
+  - Lasso Regression
+  - ElasticNet Regression
+  - Polynomial Regression (degree 2 and 3)
+  - Random Forest Regressor
+  - Gradient Boosting Regressor
+- Evaluation with CV and test-set metrics (R2, RMSE, MAE)
+- Best model persisted for reuse
+
+### Stage 03 - Model Refinement
+
+- Polynomial + Ridge pipeline with scaling
+- Hyperparameter tuning using Grid Search
+- 5-fold validation for stability checks
+- Diagnostic plots:
+  - Predicted vs Actual
+  - Residual diagnostics (scatter + distribution)
+
+## Current Best Result (Stage 02 Benchmark)
+
+- Best Model: Gradient Boosting
+- Test R2: 0.9434514878432829
+- Test RMSE: 2630.3094846427352
+- Test MAE: 1634.6021185130946
+
+Source: `02-baseline-modeling/outputs/metrics/best_model_metrics.json`
 
 ## Project Structure
 
@@ -40,70 +75,63 @@ used-car-price-intelligence-platform/
 |-- data/
 |   `-- usedcars.csv
 |-- 01-eda/
+|   |-- README.md
+|   |-- OUTPUT_PREVIEWS.md
 |   |-- EDA - UsedCars.ipynb
-|   |-- boxplots-categorical/
-|   `-- regression-plots/
-|-- 02-linear-polynomial/
-|   `-- Used Cars Price Prediction.ipynb
+|   `-- outputs/
+|       |-- overview/
+|       |-- numerical/
+|       |-- categorical/
+|       `-- bivariate/
+|-- 02-baseline-modeling/
+|   |-- README.md
+|   |-- OUTPUT_PREVIEWS.md
+|   |-- Used Cars Price Prediction.ipynb
+|   `-- outputs/
+|       |-- figures/
+|       |-- metrics/
+|       `-- models/
 `-- 03-model-refinement/
-    `-- Used Car Price Prediction.ipynb
+    |-- README.md
+    |-- OUTPUT_PREVIEWS.md
+    |-- Used Car Price Prediction.ipynb
+    `-- outputs/
+        `-- figures/
 ```
 
-## Methods & Models Used
+## Methods and Evaluation
 
-- Data analysis: descriptive statistics, correlation analysis, distribution and category plots
-- Feature engineering: one-hot encoding, polynomial feature expansion, scaling
-- Models:
-  - Linear Regression
-  - Polynomial Regression
-  - Ridge Regression
-- Validation:
-  - Train/test split
-  - 4-fold cross-validation
-  - Grid search for Ridge `alpha`
-- Metrics: R-squared, Mean Squared Error (MSE), residual analysis
-
-## Results / Insights
-
-Model comparison highlights:
-- Linear Regression (single feature): R2 = 0.761, MSE = 15,021,126
-- Polynomial Regression (single feature): R2 = 0.761, MSE = 15,016,547
-- Polynomial Pipeline (3 features): R2 = 0.828, MSE = 10,819,563
-
-Key takeaways:
-- Non-linear modeling improved fit over a basic linear baseline
-- Multi-feature modeling significantly increased predictive performance
-- Regularization and validation improved model reliability
+- Preprocessing: numeric conversion, one-hot encoding, scaling, missing-value handling
+- Validation: train/test split + cross-validation
+- Tuning: Grid Search for regularization control
+- Metrics: R2, RMSE, MAE, residual diagnostics
 
 ## How to Run
 
-1. Clone the repository
+1. Install dependencies:
+
 ```bash
-git clone https://github.com/yourusername/used-car-price-intelligence-platform.git
-cd used-car-price-intelligence-platform
+pip install pandas numpy matplotlib seaborn scikit-learn joblib jupyter
 ```
 
-2. Install dependencies
-```bash
-pip install pandas numpy matplotlib seaborn scikit-learn jupyter
-```
+2. Start Jupyter:
 
-3. Launch notebooks
 ```bash
 jupyter notebook
 ```
 
-4. Run in sequence:
+3. Run notebooks in order:
+
 - `01-eda/EDA - UsedCars.ipynb`
-- `02-linear-polynomial/Used Cars Price Prediction.ipynb`
+- `02-baseline-modeling/Used Cars Price Prediction.ipynb`
 - `03-model-refinement/Used Car Price Prediction.ipynb`
 
-## Future Improvements
+## Near-Term Next Steps
 
-- Add ensemble models (Random Forest, XGBoost)
-- Expand dataset size and feature coverage
-- Expose model through an API or lightweight dashboard
-- Add model versioning and automated retraining pipeline
+- Build ensemble strategies (Gradient Boosting + Random Forest blending/stacking)
+- Add feature importance and explainability (permutation importance, SHAP)
+- Package inference as a lightweight API
+- Add monitoring and retraining workflow for production readiness
 
 ## Author
 
