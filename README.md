@@ -12,7 +12,7 @@ This repository contains one connected pipeline across three stages:
 
 Dataset summary:
 
-- Records: 201
+- Records: 500 
 - Features: 29
 - Target: `price`
 - Shared dataset: `data/usedcars.csv`
@@ -61,9 +61,9 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 ## Current Best Result (Stage 02 Benchmark)
 
 - Best Model: Gradient Boosting
-- Test R2: 0.9434514878432829
-- Test RMSE: 2630.3094846427352
-- Test MAE: 1634.6021185130946
+- Test R²: 0.9605 
+- Test RMSE: 1841.79 
+- Test MAE: 1082.22 
 
 Source: `02-baseline-modeling/outputs/metrics/best_model_metrics.json`
 

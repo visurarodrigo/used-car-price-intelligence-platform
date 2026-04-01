@@ -22,7 +22,7 @@ This folder contains a fully refreshed and professional EDA workflow for the Use
 ## Dataset Snapshot
 
 - Source: `../data/usedcars.csv`
-- Rows: 201
+- Rows: 500 
 - Columns: 29
 - Target: `price`
 

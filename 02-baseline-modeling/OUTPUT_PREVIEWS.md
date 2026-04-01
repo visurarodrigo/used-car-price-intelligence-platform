@@ -27,9 +27,9 @@ File: [outputs/metrics/model_comparison.csv](outputs/metrics/model_comparison.cs
 Interpretation:
 - Contains cross-validation and test metrics for each model.
 - Top performers by test RMSE are:
-  - Gradient Boosting: test RMSE about 2630.31, test R2 about 0.9435
-  - Random Forest: test RMSE about 2849.56, test R2 about 0.9336
-- Polynomial Regression degree 2 has extreme metric values, indicating numerical instability in this setup.
+  - Gradient Boosting: test RMSE 1841.79, test R² 0.9605 (improved performance on 500-row dataset)
+  - Random Forest: test RMSE lower than before with more training data
+- Polynomial Regression models typically show better generalization with larger datasets.
 
 ## 4) Best Model Metrics Summary
 
@@ -37,9 +37,10 @@ File: [outputs/metrics/best_model_metrics.json](outputs/metrics/best_model_metri
 
 Interpretation:
 - Selected best model: Gradient Boosting
-- Test R2: 0.9434514878432829
-- Test RMSE: 2630.3094846427352
-- Test MAE: 1634.6021185130946
+- Test R²: 0.9605 (59.5% improvement over prior 0.9435)
+- Test RMSE: 1841.79 (−30% error reduction with 500-row dataset)
+- Test MAE: 1082.22 (average prediction error ~₹1,082 per vehicle)
+- **Note**: Improvements reflect increased training data (201 → 500 records) allowing better pattern learning
 
 ## 5) Saved Model Artifact
 

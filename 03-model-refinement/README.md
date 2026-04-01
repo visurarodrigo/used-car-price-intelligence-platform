@@ -38,7 +38,7 @@ All generated outputs are automatically saved to:
 ## Dataset Context
 
 - **Source**: `../data/usedcars.csv`
-- **Rows**: 201 observations
+- **Rows**: 500 observations 
 - **Prediction Target**: Price (continuous)
 - **Note**: Inherits feature engineering and preprocessing logic from Stages 1 and 2
 
