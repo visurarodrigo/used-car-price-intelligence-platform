@@ -2,13 +2,17 @@
 
 This file provides a visual preview of all exported EDA charts from `01-eda/outputs/`, with a short interpretation for each.
 
+Stage 1 now has two responsibilities:
+- Perform EDA and export charts
+- Export a fully cleaned handoff dataset for downstream modeling at `outputs/processed/usedcars_stage1.csv`
+
 ## 1. Missing Value Percentage by Feature
 
 ![Missing Value Percentage](outputs/overview/missing-value-percentage.png)
 
 **Interpretation:**
 - Most features are complete, with only a few columns showing missing values.
-- Missingness appears low and manageable, so targeted imputation should be sufficient instead of heavy row deletion.
+- Missingness appears low and manageable, which supports robust preprocessing in the Stage 1 cleaning export.
 
 ## 2. Price Distribution and Boxplot
 
@@ -24,7 +28,7 @@ This file provides a visual preview of all exported EDA charts from `01-eda/outp
 
 **Interpretation:**
 - Numerical variables have mixed distribution shapes (some symmetric, some skewed).
-- Feature scaling and optional transformation (for highly skewed variables) may improve model stability.
+- Feature scaling and transformation are handled in downstream modeling pipelines.
 
 ## 4. Categorical Feature Countplots
 
@@ -32,7 +36,7 @@ This file provides a visual preview of all exported EDA charts from `01-eda/outp
 
 **Interpretation:**
 - Category frequencies are imbalanced across several features.
-- Rare categories may need careful handling (grouping or regularization-aware encoding) during modeling.
+- Category imbalance is handled using one-hot encoding in the Stage 1 cleaned export.
 
 ## 5. Price vs Categorical Features (Boxplots)
 
@@ -63,4 +67,16 @@ This file provides a visual preview of all exported EDA charts from `01-eda/outp
 Overall, the outputs indicate:
 - Good data quality with limited missingness.
 - Strong predictive signal in both numeric and categorical features.
-- Right-skewed target and possible outliers, which should be addressed in modeling strategy.
+- Right-skewed target and possible outliers, which should be handled in modeling strategy.
+
+## Stage 1 Export Snapshot
+
+In addition to charts, Stage 1 exports a cleaned dataset for reuse in Stages 2 and 3.
+
+File: [outputs/processed/usedcars_stage1.csv](outputs/processed/usedcars_stage1.csv)
+
+Export characteristics:
+- One-hot encoded categorical variables
+- Numeric-only columns
+- Missing values handled
+- Consistent reusable handoff for downstream notebooks

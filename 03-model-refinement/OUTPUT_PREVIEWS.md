@@ -2,6 +2,11 @@
 
 This document provides a visual gallery of all diagnostic outputs generated during **Stage 03: Model Refinement and Advanced Tuning**, with interpretation notes for each.
 
+Data context:
+- Stage 3 uses the same cleaned Stage 1 dataset as Stage 2
+- Cleaning and encoding are already completed upstream
+- This stage focuses on refinement, tuning, and diagnostics
+
 ## 1. Predicted vs Actual Car Prices
 
 ![Predicted vs Actual Car Prices](outputs/figures/predicted_vs_actual.png)
@@ -49,6 +54,8 @@ From the stage refinement process:
   - **MSE**: Mean squared error penalizes large mistakes
   - **MAE**: Mean absolute error in original price units (most interpretable)
 
+Because input data is pre-cleaned, metric differences here mainly reflect model/tuning choices, not preprocessing differences.
+
 ## 4. Diagnostics Checklist
 
 Use these outputs to validate model quality:
@@ -66,6 +73,8 @@ Use these outputs to validate model quality:
 3. **If R² < 0.85** (moderate): Revisit feature engineering or hyperparameter bounds in Grid Search
 4. **If residuals show pattern**: Investigate interaction terms or domain-specific features
 5. **If outliers present**: Evaluate robust regression methods or outlier treatment strategies
+
+6. **If Stage 3 underperforms Stage 2**: Expand the Ridge alpha grid, test polynomial degree alternatives, or validate split sensitivity with repeated CV
 
 ---
 
