@@ -12,10 +12,11 @@ This repository contains one connected pipeline across three stages:
 
 Dataset summary:
 
-- Records: 500 
-- Features: 29
+- Raw Records: 500 
+- Raw Features: 29
 - Target: `price`
-- Shared dataset: `data/usedcars.csv`
+- Raw dataset: `data/usedcars.csv`
+- **Cleaned dataset** (after Stage 1): `01-eda/outputs/processed/usedcars_stage1.csv` (69 columns after one-hot encoding)
 
 ## Business Problem
 
@@ -28,17 +29,24 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 
 ## Stage Summary
 
-### Stage 01 - EDA
+### Stage 01 - EDA + Data Cleaning
 
 - Data quality checks: missing values, duplicates, dtypes
 - Univariate and bivariate visual exploration
 - Numerical and categorical behavior vs `price`
 - Correlation and outlier-focused inspection
 - Exported visuals in a structured output layout
-- Publishes a canonical stage handoff dataset at `01-eda/outputs/processed/usedcars_stage1.csv`
+- **Full data cleaning pipeline**:
+  - One-hot encodes categorical features
+  - Removes rows with missing target
+  - Converts all features to numeric
+  - Imputes missing values with median
+- Publishes fully cleaned, ready-to-model dataset at `01-eda/outputs/processed/usedcars_stage1.csv`
 
 ### Stage 02 - Baseline Modeling
 
+- Loads pre-cleaned data from Stage 01 (all numeric, no missing values)
+- Automated train/test split (80/20) with 5-fold cross-validation
 - Benchmarked model families:
   - Linear Regression
   - Ridge Regression
@@ -47,20 +55,23 @@ This project builds a data-driven pricing intelligence workflow to improve consi
   - Polynomial Regression (degree 2 and 3)
   - Random Forest Regressor
   - Gradient Boosting Regressor
-- Evaluation with CV and test-set metrics (R2, RMSE, MAE)
+- Evaluation with CV and test-set metrics (R², RMSE, MAE)
 - Best model persisted for reuse
-- Prefers the Stage 01 snapshot when available, otherwise falls back to `data/usedcars.csv`
+- Preprocessing: scaling for linear models (no imputation—data already clean)
 - Saves model, metrics, and comparison tables under `02-baseline-modeling/outputs/`
 
 ### Stage 03 - Model Refinement
 
-- Polynomial + Ridge pipeline with scaling
-- Hyperparameter tuning using Grid Search
-- 5-fold validation for stability checks
+- Loads pre-cleaned data from Stage 01 (same centralized dataset as Stage 02)
+- Baseline Linear Regression for reference
+- Polynomial feature expansion (degree 2) + Ridge regression
+- Hyperparameter tuning using Grid Search on Ridge `alpha`
+- 5-fold cross-validation for stability checks
+- Preprocessing: scaling within cross-validation pipeline (prevents data leakage)
 - Diagnostic plots:
   - Predicted vs Actual
   - Residual diagnostics (scatter + distribution)
-- Loads Stage 02 baseline metrics for comparison before refinement starts
+- Loads Stage 02 baseline metrics for performance comparison
 
 ## Current Best Result (Stage 02 Benchmark)
 
@@ -110,6 +121,20 @@ used-car-price-intelligence-platform/
 - Tuning: Grid Search for regularization control
 - Metrics: R2, RMSE, MAE, residual diagnostics
 
+## Data Flow
+
+```
+raw data (usedcars.csv)
+    ↓
+[Stage 01: EDA + Cleaning]
+    ↓
+cleaned data (usedcars_stage1.csv)
+    ↓
+[Stage 02: Baseline Modeling] ← [Stage 03: Model Refinement]
+    ↓
+best_model.joblib + metrics
+```
+
 ## How to Run
 
 1. Install dependencies:
@@ -118,23 +143,27 @@ used-car-price-intelligence-platform/
 pip install pandas numpy matplotlib seaborn scikit-learn joblib jupyter
 ```
 
-2. Start Jupyter:
+2. Run all stages with one command:
+
+```bash
+python run_all_stages.py
+```
+
+   This will:
+   - Execute Stage 1 (EDA + cleaning) → outputs `usedcars_stage1.csv`
+   - Execute Stage 2 (benchmarking) → uses cleaned data
+   - Execute Stage 3 (refinement) → uses cleaned data
+
+3. Or run manually in Jupyter:
 
 ```bash
 jupyter notebook
 ```
 
-3. Run notebooks in order:
-
-- `01-eda/EDA - UsedCars.ipynb`
-- `02-baseline-modeling/stage2_baseline_modeling.ipynb`
-- `03-model-refinement/stage3_model_refinement.ipynb`
-
-4. Or run all stages with one command:
-
-```bash
-python run_all_stages.py
-```
+   Then execute notebooks in order:
+   - `01-eda/stage1_eda.ipynb`
+   - `02-baseline-modeling/stage2_baseline_modeling.ipynb`
+   - `03-model-refinement/stage3_model_refinement.ipynb`
 
 ## Near-Term Next Steps
 
