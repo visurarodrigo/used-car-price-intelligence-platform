@@ -34,14 +34,14 @@ All generated outputs are saved automatically to:
 
 ## Files
 
-- `Used Cars Price Prediction.ipynb` - Main Stage 02 benchmark notebook
+- `stage2_baseline_modeling.ipynb` - Main Stage 02 benchmark notebook
 
 ## How to Run
 
 1. Install dependencies:
    `pip install pandas numpy matplotlib seaborn scikit-learn joblib jupyter`
 2. Open and run all cells in:
-   `Used Cars Price Prediction.ipynb`
+   `stage2_baseline_modeling.ipynb`
 
 ## Author
 

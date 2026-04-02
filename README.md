@@ -90,7 +90,7 @@ used-car-price-intelligence-platform/
 |-- 02-baseline-modeling/
 |   |-- README.md
 |   |-- OUTPUT_PREVIEWS.md
-|   |-- Used Cars Price Prediction.ipynb
+|   |-- stage2_baseline_modeling.ipynb
 |   `-- outputs/
 |       |-- figures/
 |       |-- metrics/
@@ -98,7 +98,7 @@ used-car-price-intelligence-platform/
 `-- 03-model-refinement/
     |-- README.md
     |-- OUTPUT_PREVIEWS.md
-    |-- Used Car Price Prediction.ipynb
+  |-- stage3_model_refinement.ipynb
     `-- outputs/
         `-- figures/
 ```
@@ -127,8 +127,14 @@ jupyter notebook
 3. Run notebooks in order:
 
 - `01-eda/EDA - UsedCars.ipynb`
-- `02-baseline-modeling/Used Cars Price Prediction.ipynb`
-- `03-model-refinement/Used Car Price Prediction.ipynb`
+- `02-baseline-modeling/stage2_baseline_modeling.ipynb`
+- `03-model-refinement/stage3_model_refinement.ipynb`
+
+4. Or run all stages with one command:
+
+```bash
+python run_all_stages.py
+```
 
 ## Near-Term Next Steps
 

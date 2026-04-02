@@ -32,7 +32,7 @@ All generated outputs are automatically saved to:
 
 ## Files
 
-- `Used Car Price Prediction.ipynb` - Main refinement and tuning notebook (clean, output-free source)
+- `stage3_model_refinement.ipynb` - Main refinement and tuning notebook (clean, output-free source)
 - `OUTPUT_PREVIEWS.md` - Visual gallery with interpretation of all exported diagnostics
 
 ## Dataset Context
@@ -56,7 +56,7 @@ All generated outputs are automatically saved to:
 1. Install dependencies:
    `pip install pandas numpy matplotlib seaborn scikit-learn joblib jupyter`
 2. Open and run all cells:
-   `Used Car Price Prediction.ipynb`
+   `stage3_model_refinement.ipynb`
 3. Check generated outputs for diagnostics:
    - Review `Predicted vs Actual Car Prices.png` for fit quality
    - Review `Residual Plot.png` for error patterns
