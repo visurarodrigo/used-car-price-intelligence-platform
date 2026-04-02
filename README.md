@@ -35,6 +35,7 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Numerical and categorical behavior vs `price`
 - Correlation and outlier-focused inspection
 - Exported visuals in a structured output layout
+- Publishes a canonical stage handoff dataset at `01-eda/outputs/processed/usedcars_stage1.csv`
 
 ### Stage 02 - Baseline Modeling
 
@@ -48,6 +49,8 @@ This project builds a data-driven pricing intelligence workflow to improve consi
   - Gradient Boosting Regressor
 - Evaluation with CV and test-set metrics (R2, RMSE, MAE)
 - Best model persisted for reuse
+- Prefers the Stage 01 snapshot when available, otherwise falls back to `data/usedcars.csv`
+- Saves model, metrics, and comparison tables under `02-baseline-modeling/outputs/`
 
 ### Stage 03 - Model Refinement
 
@@ -57,6 +60,7 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Diagnostic plots:
   - Predicted vs Actual
   - Residual diagnostics (scatter + distribution)
+- Loads Stage 02 baseline metrics for comparison before refinement starts
 
 ## Current Best Result (Stage 02 Benchmark)
 

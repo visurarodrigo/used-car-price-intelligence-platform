@@ -37,10 +37,11 @@ All generated outputs are automatically saved to:
 
 ## Dataset Context
 
-- **Source**: `../data/usedcars.csv`
+- **Source**: Stage 01 snapshot when available, otherwise `../data/usedcars.csv`
 - **Rows**: 500 observations 
 - **Prediction Target**: Price (continuous)
 - **Note**: Inherits feature engineering and preprocessing logic from Stages 1 and 2
+- **Baseline Link**: Loads Stage 2 saved metrics for direct comparison before refinement
 
 ## Key Improvements Over Stage 2
 

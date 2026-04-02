@@ -8,7 +8,7 @@ Build a regression benchmark pipeline that compares multiple model families and 
 
 ## What This Stage Covers
 
-- Robust data loading and numeric conversion from `../data/usedcars.csv`
+- Robust data loading and numeric conversion from the Stage 01 snapshot when available, otherwise `../data/usedcars.csv`
 - Automated train/test split with 5-fold cross-validation
 - Model comparison :
   - Linear Regression
@@ -22,6 +22,7 @@ Build a regression benchmark pipeline that compares multiple model families and 
 - Standardized evaluation with R2, RMSE, and MAE
 - Automatic best-model selection
 - Artifact persistence for plots, metrics, and serialized model
+- Stage 01 handoff-aware loading keeps this notebook connected to the EDA stage
 
 ## Output Structure
 

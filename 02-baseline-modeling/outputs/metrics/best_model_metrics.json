@@ -2,5 +2,5 @@
   "best_model": "Gradient Boosting",
   "test_r2": 0.96048233541031,
   "test_rmse": 1841.788643661087,
-  "test_mae": 1082.223360246823
+  "test_mae": 1082.2233602468232
 }
