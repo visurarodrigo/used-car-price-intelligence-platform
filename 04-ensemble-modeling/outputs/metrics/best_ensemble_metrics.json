@@ -1,0 +1,10 @@
+{
+  "best_model": "Gradient Boosting",
+  "test_r2": 0.9676234321930117,
+  "test_rmse": 1667.0919691154925,
+  "test_mae": 923.5545603562045,
+  "blend_weight_gbr": 0.9,
+  "stage2_best_model": "Gradient Boosting",
+  "stage2_test_rmse": 1841.788643661087,
+  "rmse_delta_vs_stage2": -174.69667454559453
+}
