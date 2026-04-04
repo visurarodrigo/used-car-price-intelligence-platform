@@ -1,6 +1,6 @@
 ﻿# Used Car Price Intelligence Platform
 
-End-to-end machine learning project for used car price prediction, structured as a professional 3-stage workflow from analysis to refined modeling.
+End-to-end machine learning project for used car price prediction, structured as a professional 4-stage workflow from analysis to ensemble modeling.
 
 ## Project Overview
 
@@ -87,14 +87,16 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Persists comparison metrics, best-model artifact, and prediction diagnostic figure
 - Compares Stage 04 best RMSE against Stage 02 best benchmark
 
-## Current Best Result (Stage 02 Benchmark)
+## Current Best Result (Stage 04 Ensemble)
 
 - Best Model: Gradient Boosting
-- Test R²: 0.9605 
-- Test RMSE: 1841.79 
-- Test MAE: 1082.22 
+- Test R²: 0.9676
+- Test RMSE: 1667.09
+- Test MAE: 923.55
 
-Source: `02-baseline-modeling/outputs/metrics/best_model_metrics.json`
+Reference improvement vs Stage 02 best RMSE: -174.70
+
+Source: `04-ensemble-modeling/outputs/metrics/best_ensemble_metrics.json`
 
 ## Project Structure
 
@@ -106,7 +108,7 @@ used-car-price-intelligence-platform/
 |-- 01-eda/
 |   |-- README.md
 |   |-- OUTPUT_PREVIEWS.md
-|   |-- EDA - UsedCars.ipynb
+|   |-- stage1_eda.ipynb
 |   `-- outputs/
 |       |-- overview/
 |       |-- numerical/
@@ -128,6 +130,7 @@ used-car-price-intelligence-platform/
         `-- figures/
 `-- 04-ensemble-modeling/
     |-- README.md
+  |-- OUTPUT_PREVIEWS.md
     |-- stage4_ensemble_modeling.py
     `-- outputs/
         |-- figures/
@@ -153,7 +156,7 @@ raw data (usedcars.csv)
 cleaned data (usedcars_stage1.csv)
     ↓
 [Stage 02: Baseline Modeling] ← [Stage 03: Model Refinement]
-  ↓
+    ↓
 [Stage 04: Ensemble Modeling]
     ↓
 best_model.joblib + metrics
@@ -195,7 +198,6 @@ jupyter notebook
 
 ## Near-Term Next Steps
 
-- Expand and tune ensemble models to further improve prediction robustness
 - Add model explainability to show which features drive predicted price
 - Build a lightweight prediction UI for interactive price estimation
 
