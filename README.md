@@ -4,11 +4,12 @@ End-to-end machine learning project for used car price prediction, structured as
 
 ## Project Overview
 
-This repository contains one connected pipeline across three stages:
+This repository contains one connected pipeline across four stages:
 
 - `01-eda`: exploratory data analysis, quality checks, and feature-target insights
 - `02-baseline-modeling`: multi-model benchmark and best-model selection
 - `03-model-refinement`: regularized refinement, tuning, and diagnostic evaluation
+- `04-ensemble-modeling`: blending and stacking strategies for robust prediction
 
 Dataset summary:
 
@@ -73,6 +74,19 @@ This project builds a data-driven pricing intelligence workflow to improve consi
   - Residual diagnostics (scatter + distribution)
 - Loads Stage 02 baseline metrics for performance comparison
 
+### Stage 04 - Ensemble Modeling
+
+- Loads pre-cleaned data from Stage 01 (same centralized dataset as prior stages)
+- Trains and evaluates strong tree-based candidates:
+  - Random Forest Regressor
+  - Gradient Boosting Regressor
+- Implements ensemble strategies:
+  - Weighted blending (Gradient Boosting + Random Forest)
+  - Stacking regressor with Ridge meta-learner
+- Selects the best Stage 04 candidate by test RMSE
+- Persists comparison metrics, best-model artifact, and prediction diagnostic figure
+- Compares Stage 04 best RMSE against Stage 02 best benchmark
+
 ## Current Best Result (Stage 02 Benchmark)
 
 - Best Model: Gradient Boosting
@@ -112,6 +126,13 @@ used-car-price-intelligence-platform/
   |-- stage3_model_refinement.ipynb
     `-- outputs/
         `-- figures/
+`-- 04-ensemble-modeling/
+    |-- README.md
+    |-- stage4_ensemble_modeling.py
+    `-- outputs/
+        |-- figures/
+        |-- metrics/
+        `-- models/
 ```
 
 ## Methods and Evaluation
@@ -119,6 +140,7 @@ used-car-price-intelligence-platform/
 - Preprocessing: numeric conversion, one-hot encoding, scaling, missing-value handling
 - Validation: train/test split + cross-validation
 - Tuning: Grid Search for regularization control
+- Ensembling: weighted blending and stacking
 - Metrics: R2, RMSE, MAE, residual diagnostics
 
 ## Data Flow
@@ -131,6 +153,8 @@ raw data (usedcars.csv)
 cleaned data (usedcars_stage1.csv)
     ↓
 [Stage 02: Baseline Modeling] ← [Stage 03: Model Refinement]
+  ↓
+[Stage 04: Ensemble Modeling]
     ↓
 best_model.joblib + metrics
 ```
@@ -153,6 +177,7 @@ python run_all_stages.py
    - Execute Stage 1 (EDA + cleaning) → outputs `usedcars_stage1.csv`
    - Execute Stage 2 (benchmarking) → uses cleaned data
    - Execute Stage 3 (refinement) → uses cleaned data
+   - Execute Stage 4 (ensemble modeling) → saves ensemble metrics, model, and figure
 
 3. Or run manually in Jupyter:
 
@@ -165,12 +190,14 @@ jupyter notebook
    - `02-baseline-modeling/stage2_baseline_modeling.ipynb`
    - `03-model-refinement/stage3_model_refinement.ipynb`
 
+  Then run Stage 4 script:
+  - `python 04-ensemble-modeling/stage4_ensemble_modeling.py`
+
 ## Near-Term Next Steps
 
-- Build ensemble strategies (Gradient Boosting + Random Forest blending/stacking)
-- Add feature importance and explainability (permutation importance, SHAP)
-- Package inference as a lightweight API
-- Add monitoring and retraining workflow for production readiness
+- Expand and tune ensemble models to further improve prediction robustness
+- Add model explainability to show which features drive predicted price
+- Build a lightweight prediction UI for interactive price estimation
 
 ## Author
 
