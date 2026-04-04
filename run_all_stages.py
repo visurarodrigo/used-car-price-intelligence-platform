@@ -13,6 +13,8 @@ NOTEBOOKS = [
     PROJECT_ROOT / "03-model-refinement" / "stage3_model_refinement.ipynb",
 ]
 
+STAGE4_SCRIPT = PROJECT_ROOT / "04-ensemble-modeling" / "stage4_ensemble_modeling.py"
+
 
 def run_notebook(notebook_path: Path) -> None:
     if not notebook_path.exists():
@@ -34,11 +36,22 @@ def run_notebook(notebook_path: Path) -> None:
     print(f"[DONE]    {notebook_path.relative_to(PROJECT_ROOT)}")
 
 
+def run_script(script_path: Path) -> None:
+    if not script_path.exists():
+        raise FileNotFoundError(f"Script not found: {script_path}")
+
+    print(f"\n[RUNNING] {script_path.relative_to(PROJECT_ROOT)}")
+    cmd = [sys.executable, str(script_path)]
+    subprocess.run(cmd, check=True, cwd=PROJECT_ROOT)
+    print(f"[DONE]    {script_path.relative_to(PROJECT_ROOT)}")
+
+
 def main() -> int:
-    print("Executing used-car project notebooks in sequence...")
+    print("Executing used-car project stages in sequence...")
     try:
         for notebook in NOTEBOOKS:
             run_notebook(notebook)
+        run_script(STAGE4_SCRIPT)
     except subprocess.CalledProcessError as exc:
         print(f"\nExecution failed with exit code {exc.returncode}.")
         return exc.returncode
