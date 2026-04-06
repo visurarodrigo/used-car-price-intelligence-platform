@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+# Stage 05 depends on the cleaned Stage 01 dataset and Stage 04 metrics.
 DATA_PATH = PROJECT_ROOT / "01-eda" / "outputs" / "processed" / "usedcars_stage1.csv"
 STAGE4_METRICS_PATH = PROJECT_ROOT / "04-ensemble-modeling" / "outputs" / "metrics" / "best_ensemble_metrics.json"
 
@@ -33,12 +34,14 @@ RANDOM_STATE = 42
 
 
 def ensure_output_dirs() -> None:
+    # Create the output folders once so later save operations stay simple.
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     METRICS_DIR.mkdir(parents=True, exist_ok=True)
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_cleaned_data() -> pd.DataFrame:
+    # Fail fast if Stage 01 output is missing or malformed.
     if not DATA_PATH.exists():
         raise FileNotFoundError(f"Cleaned dataset not found: {DATA_PATH}")
     df = pd.read_csv(DATA_PATH)
@@ -48,12 +51,14 @@ def load_cleaned_data() -> pd.DataFrame:
 
 
 def split_features_target(df: pd.DataFrame) -> tuple[pd.DataFrame, np.ndarray]:
+    # Separate the target so the model only learns from feature columns.
     features = df.drop(columns=["price"])
     target = df["price"].to_numpy()
     return features, target
 
 
 def build_model() -> GradientBoostingRegressor:
+    # Use a strong tree-based regressor that is compatible with permutation importance.
     return GradientBoostingRegressor(
         n_estimators=500,
         learning_rate=0.05,
@@ -63,6 +68,7 @@ def build_model() -> GradientBoostingRegressor:
 
 
 def train_stage5_model() -> tuple[GradientBoostingRegressor, pd.DataFrame, pd.DataFrame, np.ndarray, np.ndarray]:
+    # Train on a reproducible split so metrics and explanations are stable.
     df = load_cleaned_data()
     features, target = split_features_target(df)
 
@@ -79,6 +85,7 @@ def train_stage5_model() -> tuple[GradientBoostingRegressor, pd.DataFrame, pd.Da
 
 
 def evaluate_predictions(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]:
+    # Return the standard regression metrics used across the project.
     return {
         "r2": float(r2_score(y_true, y_pred)),
         "rmse": float(np.sqrt(mean_squared_error(y_true, y_pred))),
@@ -92,6 +99,7 @@ def compute_permutation_importance(
     y_test: np.ndarray,
     feature_names: list[str],
 ) -> pd.DataFrame:
+    # Shuffle each feature repeatedly and measure how much error increases.
     result = permutation_importance(
         model,
         X_test,
@@ -112,6 +120,7 @@ def compute_permutation_importance(
 
 
 def save_importance_plot(importance_df: pd.DataFrame, output_path: Path, top_n: int = 15) -> None:
+    # Plot the strongest drivers of prediction error in a readable horizontal chart.
     top_features = importance_df.head(top_n).sort_values("importance_mean", ascending=True)
 
     plt.figure(figsize=(10, 7))
@@ -124,6 +133,7 @@ def save_importance_plot(importance_df: pd.DataFrame, output_path: Path, top_n: 
 
 
 def save_prediction_plot(y_true: np.ndarray, y_pred: np.ndarray, output_path: Path) -> None:
+    # Show how closely the model predictions track the actual prices.
     plt.figure(figsize=(8, 6))
     plt.scatter(y_true, y_pred, alpha=0.7, edgecolors="none")
     bounds = [min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())]
@@ -137,5 +147,6 @@ def save_prediction_plot(y_true: np.ndarray, y_pred: np.ndarray, output_path: Pa
 
 
 def save_json(path: Path, payload: dict[str, Any]) -> None:
+    # Centralize JSON writing so all Stage 05 metadata is saved consistently.
     with path.open("w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2)

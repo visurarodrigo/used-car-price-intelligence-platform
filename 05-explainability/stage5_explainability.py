@@ -28,12 +28,17 @@ from stage5_shared import (
 def main() -> int:
     ensure_output_dirs()
 
+    # Train a fresh Stage 05-compatible model in the current environment.
     model, X_train, X_test, y_train, y_test = train_stage5_model()
+
+    # Score the model on the held-out test split before generating explanations.
     y_pred = model.predict(X_test)
     metrics = evaluate_predictions(y_test, y_pred)
 
+    # Permutation importance shows which features matter most to the fitted model.
     importance_df = compute_permutation_importance(model, X_test, y_test, list(X_test.columns))
 
+    # Persist the trained model and all explainability artifacts for reuse.
     joblib.dump(model, MODEL_PATH)
     importance_df.to_csv(IMPORTANCE_PATH, index=False)
     save_importance_plot(importance_df, IMPORTANCE_PLOT_PATH)
@@ -48,6 +53,7 @@ def main() -> int:
         "top_features": importance_df.head(10)["feature"].tolist(),
     }
 
+    # Reuse Stage 04 metrics when available so the RMSE comparison is explicit.
     if STAGE4_METRICS_PATH.exists():
         with STAGE4_METRICS_PATH.open("r", encoding="utf-8") as f:
             stage4 = json.load(f)

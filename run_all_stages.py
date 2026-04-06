@@ -7,12 +7,14 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 
+# Run the notebooks in dependency order so each stage can consume prior outputs.
 NOTEBOOKS = [
     PROJECT_ROOT / "01-eda" / "stage1_eda.ipynb",
     PROJECT_ROOT / "02-baseline-modeling" / "stage2_baseline_modeling.ipynb",
     PROJECT_ROOT / "03-model-refinement" / "stage3_model_refinement.ipynb",
 ]
 
+# Stage 04 and Stage 05 are script-based outputs generated after the notebooks.
 STAGE4_SCRIPT = PROJECT_ROOT / "04-ensemble-modeling" / "stage4_ensemble_modeling.py"
 STAGE5_SCRIPT = PROJECT_ROOT / "05-explainability" / "stage5_explainability.py"
 
@@ -21,6 +23,7 @@ def run_notebook(notebook_path: Path) -> None:
     if not notebook_path.exists():
         raise FileNotFoundError(f"Notebook not found: {notebook_path}")
 
+    # Execute the notebook in place so the saved outputs stay with the source file.
     print(f"\n[RUNNING] {notebook_path.relative_to(PROJECT_ROOT)}")
     cmd = [
         sys.executable,
@@ -41,6 +44,7 @@ def run_script(script_path: Path) -> None:
     if not script_path.exists():
         raise FileNotFoundError(f"Script not found: {script_path}")
 
+    # Run standalone stage scripts with the project root as the working directory.
     print(f"\n[RUNNING] {script_path.relative_to(PROJECT_ROOT)}")
     cmd = [sys.executable, str(script_path)]
     subprocess.run(cmd, check=True, cwd=PROJECT_ROOT)
@@ -48,6 +52,7 @@ def run_script(script_path: Path) -> None:
 
 
 def main() -> int:
+    # One command executes the full project pipeline from raw data to explanations.
     print("Executing used-car project stages in sequence...")
     try:
         for notebook in NOTEBOOKS:

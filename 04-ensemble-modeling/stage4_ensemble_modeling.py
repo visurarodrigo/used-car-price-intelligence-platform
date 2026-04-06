@@ -33,10 +33,12 @@ def ensure_output_dirs() -> None:
 
 
 def rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    # Keep RMSE in a reusable helper so every stage reports the same metric consistently.
     return float(np.sqrt(mean_squared_error(y_true, y_pred)))
 
 
 def evaluate(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]:
+    # Package the standard regression metrics into one place for comparison output.
     return {
         "r2": float(r2_score(y_true, y_pred)),
         "rmse": rmse(y_true, y_pred),
@@ -64,6 +66,7 @@ def find_best_blend_weight(
 
 
 def plot_predictions(y_true: np.ndarray, y_pred: np.ndarray, out_path: Path) -> None:
+    # Plot a quick fit check for the chosen ensemble winner.
     plt.figure(figsize=(8, 6))
     plt.scatter(y_true, y_pred, alpha=0.7, edgecolors="none")
     bounds = [min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())]
@@ -79,6 +82,7 @@ def plot_predictions(y_true: np.ndarray, y_pred: np.ndarray, out_path: Path) -> 
 def main() -> int:
     ensure_output_dirs()
 
+    # Load the fully cleaned dataset exported by Stage 01.
     if not DATA_PATH.exists():
         raise FileNotFoundError(f"Cleaned dataset not found: {DATA_PATH}")
 
@@ -111,6 +115,7 @@ def main() -> int:
         random_state=RANDOM_STATE,
     )
 
+    # Fit both base learners before comparing them and combining their outputs.
     rf.fit(X_train, y_train)
     gbr.fit(X_train, y_train)
 
@@ -125,6 +130,7 @@ def main() -> int:
     rf_oof = np.zeros_like(y_train, dtype=float)
     gbr_oof = np.zeros_like(y_train, dtype=float)
 
+    # Build out-of-fold predictions so the blend weight is selected on unseen folds.
     for train_idx, valid_idx in kf.split(X_train):
         X_fold_train = X_train.iloc[train_idx]
         X_fold_valid = X_train.iloc[valid_idx]
@@ -211,6 +217,7 @@ def main() -> int:
     }
 
     if STAGE2_BEST_METRICS.exists():
+        # Carry Stage 02 metrics forward so the ensemble gain is easy to report.
         with STAGE2_BEST_METRICS.open("r", encoding="utf-8") as f:
             stage2 = json.load(f)
         best_payload["stage2_best_model"] = stage2.get("best_model")
@@ -222,6 +229,7 @@ def main() -> int:
         json.dump(best_payload, f, indent=2)
 
     # Persist the winning model in a single, stable artifact path.
+    # Save whichever candidate won, but keep the artifact path stable for downstream use.
     if best_model_name == "Random Forest":
         y_best = rf_pred_test
         joblib.dump(rf, MODELS_DIR / "best_ensemble_model.joblib")
