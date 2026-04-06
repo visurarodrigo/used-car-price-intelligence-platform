@@ -1,0 +1,22 @@
+{
+  "model": "Gradient Boosting Regressor",
+  "random_state": 42,
+  "test_r2": 0.9676234321930117,
+  "test_rmse": 1667.0919691154925,
+  "test_mae": 923.5545603562045,
+  "top_features": [
+    "engine-size",
+    "curb-weight",
+    "horsepower",
+    "highway-mpg",
+    "drive-wheels_rwd",
+    "width",
+    "bore",
+    "length",
+    "make_bmw",
+    "peak-rpm"
+  ],
+  "stage4_best_model": "Gradient Boosting",
+  "stage4_test_rmse": 1667.0919691154925,
+  "rmse_delta_vs_stage4": 0.0
+}

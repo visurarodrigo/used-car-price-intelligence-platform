@@ -1,15 +1,16 @@
 ﻿# Used Car Price Intelligence Platform
 
-End-to-end machine learning project for used car price prediction, structured as a professional 4-stage workflow from analysis to ensemble modeling.
+End-to-end machine learning project for used car price prediction, structured as a professional 5-stage workflow from analysis to explainability.
 
 ## Project Overview
 
-This repository contains one connected pipeline across four stages:
+This repository contains one connected pipeline across five stages:
 
 - `01-eda`: exploratory data analysis, quality checks, and feature-target insights
 - `02-baseline-modeling`: multi-model benchmark and best-model selection
 - `03-model-refinement`: regularized refinement, tuning, and diagnostic evaluation
 - `04-ensemble-modeling`: blending and stacking strategies for robust prediction
+- `05-explainability-ui`: permutation importance and explainability artifacts
 
 Dataset summary:
 
@@ -87,7 +88,13 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Persists comparison metrics, best-model artifact, and prediction diagnostic figure
 - Compares Stage 04 best RMSE against Stage 02 best benchmark
 
-## Current Best Result (Stage 04 Ensemble)
+### Stage 05 - Explainability
+
+- Retrains the winning Stage 04 model in the current environment for compatibility
+- Generates permutation importance to explain which features drive predictions
+- Saves feature importance tables and diagnostic plots
+
+## Current Best Result (Stage 05 Explainability)
 
 - Best Model: Gradient Boosting
 - Test R²: 0.9676
@@ -96,7 +103,7 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 
 Reference improvement vs Stage 02 best RMSE: -174.70
 
-Source: `04-ensemble-modeling/outputs/metrics/best_ensemble_metrics.json`
+Source: `05-explainability-ui/outputs/metrics/stage5_model_metrics.json`
 
 ## Project Structure
 
@@ -125,17 +132,26 @@ used-car-price-intelligence-platform/
 `-- 03-model-refinement/
     |-- README.md
     |-- OUTPUT_PREVIEWS.md
-  |-- stage3_model_refinement.ipynb
+    |-- stage3_model_refinement.ipynb
     `-- outputs/
         `-- figures/
 `-- 04-ensemble-modeling/
     |-- README.md
-  |-- OUTPUT_PREVIEWS.md
+    |-- OUTPUT_PREVIEWS.md
     |-- stage4_ensemble_modeling.py
     `-- outputs/
         |-- figures/
         |-- metrics/
         `-- models/
+`-- 05-explainability-ui/
+  |-- README.md
+  |-- OUTPUT_PREVIEWS.md
+  |-- stage5_explainability.py
+  |-- stage5_shared.py
+  `-- outputs/
+    |-- figures/
+    |-- metrics/
+    `-- models/
 ```
 
 ## Methods and Evaluation
@@ -144,6 +160,7 @@ used-car-price-intelligence-platform/
 - Validation: train/test split + cross-validation
 - Tuning: Grid Search for regularization control
 - Ensembling: weighted blending and stacking
+- Explainability: permutation importance for feature influence
 - Metrics: R2, RMSE, MAE, residual diagnostics
 
 ## Data Flow
@@ -158,6 +175,8 @@ cleaned data (usedcars_stage1.csv)
 [Stage 02: Baseline Modeling] ← [Stage 03: Model Refinement]
     ↓
 [Stage 04: Ensemble Modeling]
+  ↓
+[Stage 05: Explainability]
     ↓
 best_model.joblib + metrics
 ```
@@ -181,6 +200,7 @@ python run_all_stages.py
    - Execute Stage 2 (benchmarking) → uses cleaned data
    - Execute Stage 3 (refinement) → uses cleaned data
    - Execute Stage 4 (ensemble modeling) → saves ensemble metrics, model, and figure
+    - Execute Stage 5 (explainability) → saves importance outputs and model artifact
 
 3. Or run manually in Jupyter:
 
@@ -196,10 +216,13 @@ jupyter notebook
   Then run Stage 4 script:
   - `python 04-ensemble-modeling/stage4_ensemble_modeling.py`
 
+  Then run Stage 5 explainability script:
+  - `python 05-explainability-ui/stage5_explainability.py`
+
 ## Near-Term Next Steps
 
-- Add model explainability to show which features drive predicted price
-- Build a lightweight prediction UI for interactive price estimation
+- Add optional SHAP-based local explanations for individual predictions
+- Add monitoring and retraining workflow for production readiness
 
 ## Author
 
