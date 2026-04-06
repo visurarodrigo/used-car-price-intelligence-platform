@@ -1,6 +1,6 @@
 # Stage 05: Explainability
 
-This folder is Stage 5 of the Used Car Price Intelligence Platform project.
+This folder is Stage 05 of the Used Car Price Intelligence Platform project.
 
 ## Purpose
 
@@ -32,7 +32,7 @@ Generated files are saved to:
 1. Install dependencies:
    `pip install pandas numpy matplotlib scikit-learn joblib`
 2. Generate the explainability artifacts:
-   `python 05-explainability-ui/stage5_explainability.py`
+   `python 05-explainability/stage5_explainability.py`
 
 ## Author
 

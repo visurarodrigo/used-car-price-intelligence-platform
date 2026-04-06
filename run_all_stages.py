@@ -14,7 +14,7 @@ NOTEBOOKS = [
 ]
 
 STAGE4_SCRIPT = PROJECT_ROOT / "04-ensemble-modeling" / "stage4_ensemble_modeling.py"
-STAGE5_SCRIPT = PROJECT_ROOT / "05-explainability-ui" / "stage5_explainability.py"
+STAGE5_SCRIPT = PROJECT_ROOT / "05-explainability" / "stage5_explainability.py"
 
 
 def run_notebook(notebook_path: Path) -> None:

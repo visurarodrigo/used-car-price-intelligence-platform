@@ -10,7 +10,7 @@ This repository contains one connected pipeline across five stages:
 - `02-baseline-modeling`: multi-model benchmark and best-model selection
 - `03-model-refinement`: regularized refinement, tuning, and diagnostic evaluation
 - `04-ensemble-modeling`: blending and stacking strategies for robust prediction
-- `05-explainability-ui`: permutation importance and explainability artifacts
+- `05-explainability`: permutation importance and explainability artifacts
 
 Dataset summary:
 
@@ -103,7 +103,7 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 
 Reference improvement vs Stage 02 best RMSE: -174.70
 
-Source: `05-explainability-ui/outputs/metrics/stage5_model_metrics.json`
+Source: `05-explainability/outputs/metrics/stage5_model_metrics.json`
 
 ## Project Structure
 
@@ -143,7 +143,7 @@ used-car-price-intelligence-platform/
         |-- figures/
         |-- metrics/
         `-- models/
-`-- 05-explainability-ui/
+`-- 05-explainability/
   |-- README.md
   |-- OUTPUT_PREVIEWS.md
   |-- stage5_explainability.py
@@ -200,7 +200,7 @@ python run_all_stages.py
    - Execute Stage 2 (benchmarking) → uses cleaned data
    - Execute Stage 3 (refinement) → uses cleaned data
    - Execute Stage 4 (ensemble modeling) → saves ensemble metrics, model, and figure
-    - Execute Stage 5 (explainability) → saves importance outputs and model artifact
+   - Execute Stage 5 (explainability) → saves importance outputs and model artifact
 
 3. Or run manually in Jupyter:
 
@@ -217,7 +217,7 @@ jupyter notebook
   - `python 04-ensemble-modeling/stage4_ensemble_modeling.py`
 
   Then run Stage 5 explainability script:
-  - `python 05-explainability-ui/stage5_explainability.py`
+  - `python 05-explainability/stage5_explainability.py`
 
 ## Near-Term Next Steps
 
