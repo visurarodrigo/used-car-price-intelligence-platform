@@ -1,0 +1,14 @@
+{
+  "features": {
+    "engine-size": 130,
+    "horsepower": 111,
+    "curb-weight": 2548,
+    "highway-mpg": 27,
+    "width": 64.1,
+    "length": 176.8,
+    "bore": 3.47,
+    "peak-rpm": 5000,
+    "drive-wheels_rwd": 0,
+    "make_bmw": 0
+  }
+}

@@ -4,13 +4,14 @@
 
 This project predicts used car prices with a full machine learning workflow. It starts with data exploration, moves through data cleaning and model building, and ends with ensemble modeling and explainability.
 
-The project is organized in five stages:
+The project is organized in six stages:
 
 1. Stage 01 - Exploratory data analysis and cleaning
 2. Stage 02 - Baseline modeling
 3. Stage 03 - Model refinement
 4. Stage 04 - Ensemble modeling
 5. Stage 05 - Explainability
+6. Stage 06 - Inference API
 
 The goal is simple: build a model that predicts car prices accurately and explain why the model makes those predictions.
 
@@ -160,6 +161,24 @@ Key artifacts:
 - [Prediction scatter plot](05-explainability/outputs/figures/prediction_scatter.png)
 - [Saved explainable model](05-explainability/outputs/models/stage5_explainable_model.joblib)
 
+### Stage 06 - Inference API
+
+This stage wraps the final trained model as a lightweight HTTP API for real-time inference.
+
+Main results:
+
+- Added health, feature schema, single prediction, and batch prediction endpoints
+- Added a root landing route so the base URL returns a helpful JSON message instead of 404
+- Loads Stage 05 model artifact at startup
+- Aligns incoming request data to the Stage 1 cleaned feature schema
+- Returns unknown input fields in the response for easier debugging
+
+Key artifacts:
+
+- [Stage 06 API code](06-inference-api/stage6_inference_api.py)
+- [Stage 06 README](06-inference-api/README.md)
+- [Sample payload](06-inference-api/sample_predict_payload.json)
+
 ## 4. Final Result Summary
 
 | Stage | Main Result | Test R2 | Test RMSE | Test MAE |
@@ -167,6 +186,7 @@ Key artifacts:
 | Stage 02 | Best baseline: Gradient Boosting | 0.96048233541031 | 1841.788643661087 | 1082.2233602468232 |
 | Stage 04 | Best ensemble: Gradient Boosting | 0.9676234321930117 | 1667.0919691154925 | 923.5545603562045 |
 | Stage 05 | Explainable Gradient Boosting Regressor | 0.9676234321930117 | 1667.0919691154925 | 923.5545603562045 |
+| Stage 06 | Inference API for live prediction | N/A | N/A | N/A |
 
 Overall improvement:
 
@@ -193,6 +213,7 @@ These files are the best place to quickly review charts, metrics files, and mode
 4. Stage 03 refines the modeling approach and checks residual behavior.
 5. Stage 04 builds ensemble models and picks the best one.
 6. Stage 05 explains the final model with permutation importance.
+7. Stage 06 serves the trained model through API endpoints for live prediction.
 
 You can run the full pipeline with:
 
@@ -218,7 +239,7 @@ The simple message is:
 
 Possible future improvements:
 
-1. Add a small inference API.
+1. Add request authentication and simple rate limiting to Stage 06.
 2. Add automated validation checks for new data.
 3. Add model monitoring and retraining logic.
 4. Add a lightweight deployment layer.

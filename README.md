@@ -1,16 +1,17 @@
 ﻿# Used Car Price Intelligence Platform
 
-End-to-end machine learning project for used car price prediction, structured as a professional 5-stage workflow from analysis to explainability.
+End-to-end machine learning project for used car price prediction, structured as a professional 6-stage workflow from analysis to inference API.
 
 ## Project Overview
 
-This repository contains one connected pipeline across five stages:
+This repository contains one connected workflow across six stages:
 
 - `01-eda`: exploratory data analysis, quality checks, and feature-target insights
 - `02-baseline-modeling`: multi-model benchmark and best-model selection
 - `03-model-refinement`: regularized refinement, tuning, and diagnostic evaluation
 - `04-ensemble-modeling`: blending and stacking strategies for robust prediction
 - `05-explainability`: permutation importance and explainability artifacts
+- `06-inference-api`: FastAPI-based inference service for live predictions
 
 Dataset summary:
 
@@ -94,6 +95,13 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Generates permutation importance to explain which features drive predictions
 - Saves feature importance tables and diagnostic plots
 
+### Stage 06 - Inference API
+
+- Loads the saved Stage 05 model artifact at startup
+- Exposes endpoints for health check, schema inspection, single prediction, and batch prediction
+- Aligns input payloads to the Stage 1 cleaned feature schema for consistent inference
+- Includes a root landing route at `/` so the base URL returns a useful JSON response instead of 404
+
 ## Current Best Result (Stage 05 Explainability)
 
 - Best Model: Gradient Boosting
@@ -152,6 +160,10 @@ used-car-price-intelligence-platform/
     |-- figures/
     |-- metrics/
     `-- models/
+`-- 06-inference-api/
+    |-- README.md
+    |-- sample_predict_payload.json
+    `-- stage6_inference_api.py
 ```
 
 ## Methods and Evaluation
@@ -179,6 +191,10 @@ cleaned data (usedcars_stage1.csv)
 [Stage 05: Explainability]
     ↓
 best_model.joblib + metrics
+  ↓
+[Stage 06: Inference API]
+  ↓
+live prediction endpoint
 ```
 
 ## How to Run
@@ -187,6 +203,12 @@ best_model.joblib + metrics
 
 ```bash
 pip install pandas numpy matplotlib seaborn scikit-learn joblib jupyter
+```
+
+For Stage 06 API usage:
+
+```bash
+pip install fastapi uvicorn
 ```
 
 2. Run all stages with one command:
@@ -218,6 +240,15 @@ jupyter notebook
 
   Then run Stage 5 explainability script:
   - `python 05-explainability/stage5_explainability.py`
+
+  Then run Stage 6 API:
+  - `python -m uvicorn stage6_inference_api:app --reload --app-dir 06-inference-api`
+
+  Then open one of these in the browser:
+  - `http://127.0.0.1:8000/`
+  - `http://127.0.0.1:8000/docs`
+  - `http://127.0.0.1:8000/health`
+  - `http://127.0.0.1:8000/features`
 
 ## Near-Term Next Steps
 
