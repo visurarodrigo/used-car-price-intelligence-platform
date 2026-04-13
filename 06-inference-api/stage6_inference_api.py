@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
 from typing import Any
 
@@ -14,13 +15,27 @@ from sklearn.ensemble import GradientBoostingRegressor
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MODEL_PATH = PROJECT_ROOT / "05-explainability" / "outputs" / "models" / "stage5_explainable_model.joblib"
 SCHEMA_PATH = PROJECT_ROOT / "01-eda" / "outputs" / "processed" / "usedcars_stage1.csv"
+VALIDATION_DIR = PROJECT_ROOT / "07-data-validation"
 TARGET_COLUMN = "price"
+
+STAGE7_MODULE_PATH = VALIDATION_DIR / "stage7_data_validation.py"
+
+_STAGE7_SPEC = importlib.util.spec_from_file_location("stage7_data_validation", STAGE7_MODULE_PATH)
+if _STAGE7_SPEC is None or _STAGE7_SPEC.loader is None:
+    raise FileNotFoundError(f"Validation module not found: {STAGE7_MODULE_PATH}")
+
+_STAGE7_MODULE = importlib.util.module_from_spec(_STAGE7_SPEC)
+_STAGE7_SPEC.loader.exec_module(_STAGE7_MODULE)
+
+load_validation_profile = _STAGE7_MODULE.load_validation_profile
+validate_features = _STAGE7_MODULE.validate_features
 
 app = FastAPI(title="Used Car Price Inference API", version="1.0.0")
 
 MODEL: Any | None = None
 FEATURE_COLUMNS: list[str] = []
 MODEL_SOURCE = ""
+VALIDATION_PROFILE: dict[str, Any] = {}
 
 
 class PredictRequest(BaseModel):
@@ -35,6 +50,16 @@ class BatchPredictRequest(BaseModel):
     )
 
 
+class ValidateRequest(BaseModel):
+    features: dict[str, Any] = Field(
+        ..., description="Feature-value mapping using Stage 1 cleaned feature names"
+    )
+    strict: bool = Field(
+        default=False,
+        description="When true, missing and unknown fields are treated as errors.",
+    )
+
+
 def _to_float(value: Any, feature_name: str) -> float:
     """Coerce incoming feature values to float for model compatibility."""
     try:
@@ -43,39 +68,34 @@ def _to_float(value: Any, feature_name: str) -> float:
         raise ValueError(f"Feature '{feature_name}' must be numeric. Got: {value!r}") from exc
 
 
-def _prepare_row(features: dict[str, Any]) -> tuple[np.ndarray, list[str]]:
+def _prepare_row(features: dict[str, Any], *, strict: bool = False) -> tuple[pd.DataFrame, dict[str, Any]]:
     if not FEATURE_COLUMNS:
         raise RuntimeError("Feature schema is not loaded.")
 
-    row = {col: 0.0 for col in FEATURE_COLUMNS}
-    unknown_features: list[str] = []
+    validation = validate_features(features, strict=strict)
+    if not validation["is_valid"]:
+        raise ValueError("; ".join(validation["errors"]))
 
-    for key, value in features.items():
-        if key in row:
-            row[key] = _to_float(value, key)
-        else:
-            unknown_features.append(key)
-
-    vector = np.array([row[col] for col in FEATURE_COLUMNS], dtype=float).reshape(1, -1)
-    return vector, unknown_features
+    frame = pd.DataFrame([[validation["aligned_features"][col] for col in FEATURE_COLUMNS]], columns=FEATURE_COLUMNS)
+    return frame, validation
 
 
 def _load_runtime_artifacts() -> None:
     global MODEL
     global FEATURE_COLUMNS
     global MODEL_SOURCE
+    global VALIDATION_PROFILE
 
     if not MODEL_PATH.exists():
         raise FileNotFoundError(f"Model not found: {MODEL_PATH}")
+
+    VALIDATION_PROFILE = load_validation_profile()
+    feature_columns = list(VALIDATION_PROFILE["features"])
+
     if not SCHEMA_PATH.exists():
         raise FileNotFoundError(f"Schema source not found: {SCHEMA_PATH}")
 
     schema_df = pd.read_csv(SCHEMA_PATH)
-
-    if TARGET_COLUMN not in schema_df.columns:
-        raise ValueError(f"Expected target column '{TARGET_COLUMN}' in schema source.")
-
-    feature_columns = [col for col in schema_df.columns if col != TARGET_COLUMN]
 
     try:
         model = joblib.load(MODEL_PATH)
@@ -114,6 +134,7 @@ def root() -> dict[str, Any]:
         "docs": "/docs",
         "health": "/health",
         "features": "/features",
+        "validate": "/validate",
     }
 
 
@@ -127,6 +148,7 @@ def health() -> dict[str, Any]:
         "model_path": str(MODEL_PATH.relative_to(PROJECT_ROOT)),
         "model_source": MODEL_SOURCE,
         "feature_count": len(FEATURE_COLUMNS),
+        "validation_profile_path": "07-data-validation/outputs/metrics/data_validation_profile.json",
     }
 
 
@@ -142,13 +164,23 @@ def get_features() -> dict[str, Any]:
     }
 
 
+@app.post("/validate")
+def validate(request: ValidateRequest) -> dict[str, Any]:
+    try:
+        report = validate_features(request.features, strict=request.strict)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return report
+
+
 @app.post("/predict")
 def predict(request: PredictRequest) -> dict[str, Any]:
     if MODEL is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
 
     try:
-        vector, unknown_features = _prepare_row(request.features)
+        vector, validation = _prepare_row(request.features)
         prediction = float(MODEL.predict(vector)[0])
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -157,7 +189,7 @@ def predict(request: PredictRequest) -> dict[str, Any]:
 
     return {
         "predicted_price": prediction,
-        "unknown_features_ignored": unknown_features,
+        "validation": validation,
     }
 
 
@@ -168,16 +200,16 @@ def predict_batch(request: BatchPredictRequest) -> dict[str, Any]:
     if not request.rows:
         raise HTTPException(status_code=400, detail="rows must contain at least one item")
 
-    vectors: list[np.ndarray] = []
-    unknown_per_row: list[list[str]] = []
+    frames: list[pd.DataFrame] = []
+    validation_reports: list[dict[str, Any]] = []
 
     try:
         for row in request.rows:
-            vector, unknown = _prepare_row(row)
-            vectors.append(vector)
-            unknown_per_row.append(unknown)
+            vector, validation = _prepare_row(row)
+            frames.append(vector)
+            validation_reports.append(validation)
 
-        matrix = np.vstack(vectors)
+        matrix = pd.concat(frames, ignore_index=True)
         predictions = [float(value) for value in MODEL.predict(matrix)]
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -187,5 +219,5 @@ def predict_batch(request: BatchPredictRequest) -> dict[str, Any]:
     return {
         "count": len(predictions),
         "predictions": predictions,
-        "unknown_features_ignored": unknown_per_row,
+        "validation": validation_reports,
     }

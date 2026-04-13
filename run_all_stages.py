@@ -18,6 +18,7 @@ NOTEBOOKS = [
 # Stage 04 and Stage 05 are script-based outputs generated after the notebooks.
 STAGE4_SCRIPT = PROJECT_ROOT / "04-ensemble-modeling" / "stage4_ensemble_modeling.py"
 STAGE5_SCRIPT = PROJECT_ROOT / "05-explainability" / "stage5_explainability.py"
+STAGE7_SCRIPT = PROJECT_ROOT / "07-data-validation" / "stage7_data_validation.py"
 STAGE6_SCRIPT = PROJECT_ROOT / "06-inference-api" / "stage6_inference_api.py"
 
 
@@ -75,6 +76,16 @@ def validate_inference_api(script_path: Path) -> None:
     print(f"[INFO]    Stage 6 feature count: {health.get('feature_count', 'unknown')}")
 
 
+def run_stage7_validation(script_path: Path) -> None:
+    if not script_path.exists():
+        raise FileNotFoundError(f"Script not found: {script_path}")
+
+    print(f"\n[RUNNING] {script_path.relative_to(PROJECT_ROOT)}")
+    cmd = [sys.executable, str(script_path)]
+    subprocess.run(cmd, check=True, cwd=PROJECT_ROOT)
+    print(f"[DONE]    {script_path.relative_to(PROJECT_ROOT)}")
+
+
 def main() -> int:
     # One command executes the full project pipeline from raw data to explanations.
     print("Executing used-car project stages in sequence...")
@@ -83,6 +94,7 @@ def main() -> int:
             run_notebook(notebook)
         run_script(STAGE4_SCRIPT)
         run_script(STAGE5_SCRIPT)
+        run_stage7_validation(STAGE7_SCRIPT)
         validate_inference_api(STAGE6_SCRIPT)
     except subprocess.CalledProcessError as exc:
         print(f"\nExecution failed with exit code {exc.returncode}.")
