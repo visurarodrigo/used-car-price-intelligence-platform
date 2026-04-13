@@ -1,0 +1,689 @@
+{
+  "schema_source": "01-eda\\outputs\\processed\\usedcars_stage1.csv",
+  "target_column": "price",
+  "feature_count": 68,
+  "features": [
+    "symboling",
+    "normalized-losses",
+    "wheel-base",
+    "length",
+    "width",
+    "height",
+    "curb-weight",
+    "engine-size",
+    "bore",
+    "stroke",
+    "compression-ratio",
+    "horsepower",
+    "peak-rpm",
+    "city-mpg",
+    "highway-mpg",
+    "city-L/100km",
+    "diesel",
+    "gas",
+    "make_audi",
+    "make_bmw",
+    "make_chevrolet",
+    "make_dodge",
+    "make_honda",
+    "make_isuzu",
+    "make_jaguar",
+    "make_mazda",
+    "make_mercedes-benz",
+    "make_mercury",
+    "make_mitsubishi",
+    "make_nissan",
+    "make_peugot",
+    "make_plymouth",
+    "make_porsche",
+    "make_renault",
+    "make_saab",
+    "make_subaru",
+    "make_toyota",
+    "make_volkswagen",
+    "make_volvo",
+    "aspiration_turbo",
+    "num-of-doors_two",
+    "body-style_hardtop",
+    "body-style_hatchback",
+    "body-style_sedan",
+    "body-style_wagon",
+    "drive-wheels_fwd",
+    "drive-wheels_rwd",
+    "engine-location_rear",
+    "engine-type_l",
+    "engine-type_ohc",
+    "engine-type_ohcf",
+    "engine-type_ohcv",
+    "engine-type_rotor",
+    "num-of-cylinders_five",
+    "num-of-cylinders_four",
+    "num-of-cylinders_six",
+    "num-of-cylinders_three",
+    "num-of-cylinders_twelve",
+    "num-of-cylinders_two",
+    "fuel-system_2bbl",
+    "fuel-system_4bbl",
+    "fuel-system_idi",
+    "fuel-system_mfi",
+    "fuel-system_mpfi",
+    "fuel-system_spdi",
+    "fuel-system_spfi",
+    "horsepower-binned_Low",
+    "horsepower-binned_Medium"
+  ],
+  "feature_stats": {
+    "symboling": {
+      "min": -2.0,
+      "max": 3.0,
+      "median": 1.0,
+      "mean": 0.908,
+      "std": 1.2615609378860777,
+      "unique_value_count": 6,
+      "is_binary": false
+    },
+    "normalized-losses": {
+      "min": 65.0,
+      "max": 256.0,
+      "median": 122.0,
+      "mean": 123.876,
+      "std": 33.66886728121396,
+      "unique_value_count": 96,
+      "is_binary": false
+    },
+    "wheel-base": {
+      "min": 86.6,
+      "max": 120.9,
+      "median": 96.97376570422873,
+      "mean": 98.67732695618093,
+      "std": 5.924600024035563,
+      "unique_value_count": 350,
+      "is_binary": false
+    },
+    "length": {
+      "min": 0.6780394041326285,
+      "max": 1.0,
+      "median": 0.8318098287191076,
+      "mean": 0.8383651627250437,
+      "std": 0.0569399194137711,
+      "unique_value_count": 370,
+      "is_binary": false
+    },
+    "width": {
+      "min": 0.8374999999999999,
+      "max": 1.0,
+      "median": 0.9097222222222222,
+      "mean": 0.914808490544301,
+      "std": 0.02823324332142863,
+      "unique_value_count": 341,
+      "is_binary": false
+    },
+    "height": {
+      "min": 47.8,
+      "max": 59.8,
+      "median": 54.28991611654488,
+      "mean": 53.898306446232176,
+      "std": 2.4762608881090555,
+      "unique_value_count": 345,
+      "is_binary": false
+    },
+    "curb-weight": {
+      "min": 1488.0,
+      "max": 4066.0,
+      "median": 2443.0,
+      "mean": 2549.668,
+      "std": 493.17951881236917,
+      "unique_value_count": 402,
+      "is_binary": false
+    },
+    "engine-size": {
+      "min": 61.0,
+      "max": 326.0,
+      "median": 119.0,
+      "mean": 125.924,
+      "std": 40.30273221507445,
+      "unique_value_count": 96,
+      "is_binary": false
+    },
+    "bore": {
+      "min": 2.54,
+      "max": 3.94,
+      "median": 3.31,
+      "mean": 3.32036085956479,
+      "std": 0.2682845248458846,
+      "unique_value_count": 332,
+      "is_binary": false
+    },
+    "stroke": {
+      "min": 2.07,
+      "max": 4.17,
+      "median": 3.2854997776169554,
+      "mean": 3.243032140968748,
+      "std": 0.31864138829774075,
+      "unique_value_count": 322,
+      "is_binary": false
+    },
+    "compression-ratio": {
+      "min": 7.0,
+      "max": 23.0,
+      "median": 9.00512864156142,
+      "mean": 9.89957911637977,
+      "std": 3.585135237120593,
+      "unique_value_count": 324,
+      "is_binary": false
+    },
+    "horsepower": {
+      "min": 48.0,
+      "max": 262.0,
+      "median": 95.21849283005878,
+      "mean": 103.25333903539902,
+      "std": 36.41892469356695,
+      "unique_value_count": 357,
+      "is_binary": false
+    },
+    "peak-rpm": {
+      "min": 4150.0,
+      "max": 6600.0,
+      "median": 5183.68879277472,
+      "mean": 5132.3188718307,
+      "std": 467.19797259980595,
+      "unique_value_count": 320,
+      "is_binary": false
+    },
+    "city-mpg": {
+      "min": 13.0,
+      "max": 49.0,
+      "median": 24.0,
+      "mean": 24.856,
+      "std": 6.2554987011428596,
+      "unique_value_count": 29,
+      "is_binary": false
+    },
+    "highway-mpg": {
+      "min": 16.0,
+      "max": 54.0,
+      "median": 30.0,
+      "mean": 30.34,
+      "std": 6.514936684266394,
+      "unique_value_count": 31,
+      "is_binary": false
+    },
+    "city-L/100km": {
+      "min": 4.795918367346938,
+      "max": 18.07692307692308,
+      "median": 9.718638379023506,
+      "mean": 10.04268781466748,
+      "std": 2.487118248814611,
+      "unique_value_count": 327,
+      "is_binary": false
+    },
+    "diesel": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.078,
+      "std": 0.26817158686184484,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "gas": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 1.0,
+      "mean": 0.922,
+      "std": 0.26817158686184484,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_audi": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.028,
+      "std": 0.16497272501841023,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_bmw": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.038,
+      "std": 0.19119623427254,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_chevrolet": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.008,
+      "std": 0.08908422980528033,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_dodge": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.044,
+      "std": 0.20509509989270833,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_honda": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.06,
+      "std": 0.23748684174075835,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_isuzu": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.008,
+      "std": 0.08908422980528033,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_jaguar": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.01,
+      "std": 0.09949874371066199,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_mazda": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.1,
+      "std": 0.3,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_mercedes-benz": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.034,
+      "std": 0.18122913673027305,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_mercury": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.004,
+      "std": 0.063118935352238,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_mitsubishi": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.046,
+      "std": 0.2094850830011531,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_nissan": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.108,
+      "std": 0.31038041175306147,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_peugot": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.046,
+      "std": 0.2094850830011531,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_plymouth": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.03,
+      "std": 0.1705872210923198,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_porsche": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.02,
+      "std": 0.13999999999999996,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_renault": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.008,
+      "std": 0.08908422980528033,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_saab": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.052,
+      "std": 0.2220270253820467,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_subaru": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.054,
+      "std": 0.22601769842204833,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_toyota": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.156,
+      "std": 0.3628553430776512,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_volkswagen": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.076,
+      "std": 0.2649981132008302,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "make_volvo": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.05,
+      "std": 0.21794494717703367,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "aspiration_turbo": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.154,
+      "std": 0.3609487498246808,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "num-of-doors_two": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.45,
+      "std": 0.49749371855331004,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "body-style_hardtop": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.042,
+      "std": 0.20058913230780973,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "body-style_hatchback": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.354,
+      "std": 0.4782091592598368,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "body-style_sedan": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.448,
+      "std": 0.49728864857344174,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "body-style_wagon": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.128,
+      "std": 0.33408980828513757,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "drive-wheels_fwd": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 1.0,
+      "mean": 0.598,
+      "std": 0.49030194778320024,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "drive-wheels_rwd": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.36,
+      "std": 0.48,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "engine-location_rear": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.014,
+      "std": 0.11749042514179611,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "engine-type_l": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.05,
+      "std": 0.21794494717703367,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "engine-type_ohc": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 1.0,
+      "mean": 0.724,
+      "std": 0.44701677820860364,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "engine-type_ohcf": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.068,
+      "std": 0.251745903640953,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "engine-type_ohcv": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.074,
+      "std": 0.2617708921939183,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "engine-type_rotor": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.026,
+      "std": 0.15913516267626085,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "num-of-cylinders_five": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.048,
+      "std": 0.21376622745419818,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "num-of-cylinders_four": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 1.0,
+      "mean": 0.772,
+      "std": 0.41954260808647315,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "num-of-cylinders_six": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.128,
+      "std": 0.33408980828513757,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "num-of-cylinders_three": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.004,
+      "std": 0.063118935352238,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "num-of-cylinders_twelve": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.002,
+      "std": 0.044676615807377355,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "num-of-cylinders_two": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.026,
+      "std": 0.15913516267626085,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "fuel-system_2bbl": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.324,
+      "std": 0.46799999999999997,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "fuel-system_4bbl": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.024,
+      "std": 0.15304901175767194,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "fuel-system_idi": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.078,
+      "std": 0.26817158686184484,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "fuel-system_mfi": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.004,
+      "std": 0.063118935352238,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "fuel-system_mpfi": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.482,
+      "std": 0.4996758949559204,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "fuel-system_spdi": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.034,
+      "std": 0.18122913673027302,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "fuel-system_spfi": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.006,
+      "std": 0.07722693830523131,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "horsepower-binned_Low": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 1.0,
+      "mean": 0.55,
+      "std": 0.49749371855331004,
+      "unique_value_count": 2,
+      "is_binary": true
+    },
+    "horsepower-binned_Medium": {
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0,
+      "mean": 0.314,
+      "std": 0.46411636471902173,
+      "unique_value_count": 2,
+      "is_binary": true
+    }
+  }
+}
