@@ -1,10 +1,10 @@
 ﻿# Used Car Price Intelligence Platform
 
-End-to-end machine learning project for used car price prediction, structured as a professional 6-stage workflow from analysis to inference API.
+End-to-end machine learning project for used car price prediction, structured as a professional 7-stage workflow from analysis to inference API and data validation.
 
 ## Project Overview
 
-This repository contains one connected workflow across six stages:
+This repository contains one connected workflow across seven stages:
 
 - `01-eda`: exploratory data analysis, quality checks, and feature-target insights
 - `02-baseline-modeling`: multi-model benchmark and best-model selection
@@ -12,6 +12,7 @@ This repository contains one connected workflow across six stages:
 - `04-ensemble-modeling`: blending and stacking strategies for robust prediction
 - `05-explainability`: permutation importance and explainability artifacts
 - `06-inference-api`: FastAPI-based inference service for live predictions
+- `07-data-validation`: reusable validation checks for incoming prediction data
 
 Dataset summary:
 
@@ -102,6 +103,12 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Aligns input payloads to the Stage 1 cleaned feature schema for consistent inference
 - Includes a root landing route at `/` so the base URL returns a useful JSON response instead of 404
 
+### Stage 07 - Data Validation
+
+- Builds a reusable validation profile from the cleaned Stage 1 dataset
+- Checks payloads for missing fields, unknown fields, numeric coercion, and out-of-range values
+- Feeds validation results into the inference API before prediction
+
 ## Current Best Result (Stage 05 Explainability)
 
 - Best Model: Gradient Boosting
@@ -164,6 +171,9 @@ used-car-price-intelligence-platform/
     |-- README.md
     |-- sample_predict_payload.json
     `-- stage6_inference_api.py
+`-- 07-data-validation/
+    |-- README.md
+    `-- stage7_data_validation.py
 ```
 
 ## Methods and Evaluation
@@ -189,6 +199,8 @@ cleaned data (usedcars_stage1.csv)
 [Stage 04: Ensemble Modeling]
   ↓
 [Stage 05: Explainability]
+    ↓
+validation profile + data checks
     ↓
 best_model.joblib + metrics
   ↓
@@ -223,6 +235,8 @@ python run_all_stages.py
    - Execute Stage 3 (refinement) → uses cleaned data
    - Execute Stage 4 (ensemble modeling) → saves ensemble metrics, model, and figure
    - Execute Stage 5 (explainability) → saves importance outputs and model artifact
+  - Execute Stage 7 (validation) → saves validation profile and sample report
+  - Validate Stage 6 API → confirms model and validation layer load correctly
 
 3. Or run manually in Jupyter:
 
@@ -244,16 +258,15 @@ jupyter notebook
   Then run Stage 6 API:
   - `python -m uvicorn stage6_inference_api:app --reload --app-dir 06-inference-api`
 
+  Then run Stage 7 validation profile generation:
+   - `python 07-data-validation/stage7_data_validation.py`
+
   Then open one of these in the browser:
   - `http://127.0.0.1:8000/`
   - `http://127.0.0.1:8000/docs`
   - `http://127.0.0.1:8000/health`
   - `http://127.0.0.1:8000/features`
 
-## Near-Term Next Steps
-
-- Add optional SHAP-based local explanations for individual predictions
-- Add monitoring and retraining workflow for production readiness
 
 ## Author
 

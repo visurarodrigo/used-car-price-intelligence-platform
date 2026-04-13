@@ -2,9 +2,9 @@
 
 ## 1. Project Summary
 
-This project predicts used car prices with a full machine learning workflow. It starts with data exploration, moves through data cleaning and model building, and ends with ensemble modeling and explainability.
+This project predicts used car prices with a full machine learning workflow. It starts with data exploration, moves through data cleaning and model building, and ends with ensemble modeling, explainability, and data validation.
 
-The project is organized in six stages:
+The project is organized in seven stages:
 
 1. Stage 01 - Exploratory data analysis and cleaning
 2. Stage 02 - Baseline modeling
@@ -12,6 +12,7 @@ The project is organized in six stages:
 4. Stage 04 - Ensemble modeling
 5. Stage 05 - Explainability
 6. Stage 06 - Inference API
+7. Stage 07 - Automated data validation
 
 The goal is simple: build a model that predicts car prices accurately and explain why the model makes those predictions.
 
@@ -179,6 +180,18 @@ Key artifacts:
 - [Stage 06 README](06-inference-api/README.md)
 - [Sample payload](06-inference-api/sample_predict_payload.json)
 
+### Stage 07 - Automated Data Validation
+
+This stage adds validation checks for incoming data before it is passed into the modeling pipeline.
+
+Planned focus:
+
+- Schema validation for required fields
+- Type and range checks for numeric inputs
+- Missing-value thresholds and rejection rules
+- Categorical value checks against the trained feature space
+- Clear error messages for invalid or unexpected data
+
 ## 4. Final Result Summary
 
 | Stage | Main Result | Test R2 | Test RMSE | Test MAE |
@@ -214,6 +227,7 @@ These files are the best place to quickly review charts, metrics files, and mode
 5. Stage 04 builds ensemble models and picks the best one.
 6. Stage 05 explains the final model with permutation importance.
 7. Stage 06 serves the trained model through API endpoints for live prediction.
+8. Stage 07 validates new input data before inference.
 
 You can run the full pipeline with:
 
@@ -239,10 +253,8 @@ The simple message is:
 
 Possible future improvements:
 
-1. Add request authentication and simple rate limiting to Stage 06.
-2. Add automated validation checks for new data.
-3. Add model monitoring and retraining logic.
-4. Add a lightweight deployment layer.
+1. Add model monitoring and retraining logic.
+2. Add a lightweight deployment layer.
 
 ## 10. Author
 

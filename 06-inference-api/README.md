@@ -17,6 +17,8 @@ The API expects Stage 1 cleaned feature names (numeric and one-hot encoded colum
   - Basic service status and loaded feature count
 - `GET /features`
   - Returns the exact feature list expected by the model
+- `POST /validate`
+  - Validates a payload against the Stage 1 feature schema and data ranges
 - `POST /predict`
   - Single-row prediction
 - `POST /predict-batch`
@@ -55,7 +57,8 @@ Open interactive docs:
 ## Notes
 
 - Missing expected features are filled with `0.0` by default.
-- Unknown features are ignored and returned in response as `unknown_features_ignored`.
+- Validation warnings are returned in the prediction response.
+- Unknown features are ignored by default, but they are still reported by the validation endpoint.
 - If you retrain with new features, restart the API so it reloads the new schema/model.
 - If loading the saved model fails due environment compatibility, the API automatically retrains a compatible Gradient Boosting model from the Stage 1 cleaned dataset.
 - If you added the root endpoint recently, stop and restart Uvicorn so the browser picks up the new code.
