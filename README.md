@@ -1,6 +1,6 @@
 ﻿# Used Car Price Intelligence Platform
 
-End-to-end machine learning project for used car price prediction, structured as a professional 7-stage workflow from analysis to inference API and data validation.
+End-to-end machine learning project for used car price prediction, structured as a professional 8-stage workflow from analysis to inference API and data validation.
 
 ## Project Overview
 
