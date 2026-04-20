@@ -1,0 +1,35 @@
+{
+  "stage": "Stage 08 - Productionization",
+  "current_model_source": "loaded-stage5-artifact",
+  "current_metrics": {
+    "r2": 0.9676234321930117,
+    "rmse": 1667.0919691154925,
+    "mae": 923.5545603562045
+  },
+  "baseline_rmse": 1667.0919691154925,
+  "performance_delta_vs_baseline_rmse": 0.0,
+  "mean_shift_monitor": {
+    "feature_count": 68,
+    "shifted_feature_count": 1,
+    "shifted_feature_ratio": 0.014705882352941176,
+    "z_threshold": 1.0,
+    "top_shifted_features": [
+      {
+        "feature": "num-of-cylinders_twelve",
+        "z_shift": 10000000.0
+      }
+    ]
+  },
+  "retraining_decision": {
+    "should_retrain": false,
+    "decision_reasons": [
+      "Metrics and drift checks are within alert thresholds."
+    ],
+    "baseline_rmse": 1667.0919691154925,
+    "rmse_alert_ratio": 0.05,
+    "rmse_alert_level": 1750.4465675712672,
+    "mean_shift_alert_ratio": 0.3,
+    "deployed_model_source": "stage5-model-promoted"
+  },
+  "deployed_model_path": "08-productionization/outputs/models/deployed_model.joblib"
+}

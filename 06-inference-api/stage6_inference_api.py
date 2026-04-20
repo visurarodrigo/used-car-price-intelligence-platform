@@ -13,7 +13,10 @@ from sklearn.ensemble import GradientBoostingRegressor
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-MODEL_PATH = PROJECT_ROOT / "05-explainability" / "outputs" / "models" / "stage5_explainable_model.joblib"
+MODEL_CANDIDATE_PATHS = [
+    PROJECT_ROOT / "08-productionization" / "outputs" / "models" / "deployed_model.joblib",
+    PROJECT_ROOT / "05-explainability" / "outputs" / "models" / "stage5_explainable_model.joblib",
+]
 SCHEMA_PATH = PROJECT_ROOT / "01-eda" / "outputs" / "processed" / "usedcars_stage1.csv"
 VALIDATION_DIR = PROJECT_ROOT / "07-data-validation"
 TARGET_COLUMN = "price"
@@ -35,6 +38,7 @@ app = FastAPI(title="Used Car Price Inference API", version="1.0.0")
 MODEL: Any | None = None
 FEATURE_COLUMNS: list[str] = []
 MODEL_SOURCE = ""
+LOADED_MODEL_PATH: Path | None = None
 VALIDATION_PROFILE: dict[str, Any] = {}
 
 
@@ -84,10 +88,13 @@ def _load_runtime_artifacts() -> None:
     global MODEL
     global FEATURE_COLUMNS
     global MODEL_SOURCE
+    global LOADED_MODEL_PATH
     global VALIDATION_PROFILE
 
-    if not MODEL_PATH.exists():
-        raise FileNotFoundError(f"Model not found: {MODEL_PATH}")
+    model_path = next((path for path in MODEL_CANDIDATE_PATHS if path.exists()), None)
+    if model_path is None:
+        checked_paths = [str(path.relative_to(PROJECT_ROOT)) for path in MODEL_CANDIDATE_PATHS]
+        raise FileNotFoundError(f"Model not found in any candidate path: {checked_paths}")
 
     VALIDATION_PROFILE = load_validation_profile()
     feature_columns = list(VALIDATION_PROFILE["features"])
@@ -98,7 +105,7 @@ def _load_runtime_artifacts() -> None:
     schema_df = pd.read_csv(SCHEMA_PATH)
 
     try:
-        model = joblib.load(MODEL_PATH)
+        model = joblib.load(model_path)
         MODEL_SOURCE = "saved-artifact"
     except ModuleNotFoundError:
         # If pickle compatibility breaks across sklearn versions, retrain a compatible model.
@@ -112,6 +119,7 @@ def _load_runtime_artifacts() -> None:
         )
         model.fit(X, y)
         MODEL_SOURCE = "retrained-fallback"
+        model_path = None
 
     # Keep feature order aligned with the model when available.
     model_feature_names = getattr(model, "feature_names_in_", None)
@@ -120,6 +128,7 @@ def _load_runtime_artifacts() -> None:
 
     MODEL = model
     FEATURE_COLUMNS = feature_columns
+    LOADED_MODEL_PATH = model_path
 
 
 @app.on_event("startup")
@@ -145,7 +154,9 @@ def health() -> dict[str, Any]:
 
     return {
         "status": "ok",
-        "model_path": str(MODEL_PATH.relative_to(PROJECT_ROOT)),
+        "model_path": (
+            str(LOADED_MODEL_PATH.relative_to(PROJECT_ROOT)) if LOADED_MODEL_PATH else "in-memory-retrained"
+        ),
         "model_source": MODEL_SOURCE,
         "feature_count": len(FEATURE_COLUMNS),
         "validation_profile_path": "07-data-validation/outputs/metrics/data_validation_profile.json",

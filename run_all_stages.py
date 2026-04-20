@@ -19,6 +19,7 @@ NOTEBOOKS = [
 STAGE4_SCRIPT = PROJECT_ROOT / "04-ensemble-modeling" / "stage4_ensemble_modeling.py"
 STAGE5_SCRIPT = PROJECT_ROOT / "05-explainability" / "stage5_explainability.py"
 STAGE7_SCRIPT = PROJECT_ROOT / "07-data-validation" / "stage7_data_validation.py"
+STAGE8_SCRIPT = PROJECT_ROOT / "08-productionization" / "stage8_productionization.py"
 STAGE6_SCRIPT = PROJECT_ROOT / "06-inference-api" / "stage6_inference_api.py"
 
 
@@ -95,6 +96,7 @@ def main() -> int:
         run_script(STAGE4_SCRIPT)
         run_script(STAGE5_SCRIPT)
         run_stage7_validation(STAGE7_SCRIPT)
+        run_script(STAGE8_SCRIPT)
         validate_inference_api(STAGE6_SCRIPT)
     except subprocess.CalledProcessError as exc:
         print(f"\nExecution failed with exit code {exc.returncode}.")

@@ -1,0 +1,12 @@
+{
+  "stage": "Stage 08 - Productionization",
+  "deployed_model_path": "08-productionization/outputs/models/deployed_model.joblib",
+  "deployment_files": {
+    "dockerfile": "08-productionization/outputs/deployment/Dockerfile",
+    "docker_compose": "08-productionization/outputs/deployment/docker-compose.yml",
+    "run_script_powershell": "08-productionization/outputs/deployment/start_api.ps1",
+    "run_script_bash": "08-productionization/outputs/deployment/start_api.sh"
+  },
+  "api_entrypoint": "06-inference-api/stage6_inference_api.py",
+  "default_port": 8000
+}

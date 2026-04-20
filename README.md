@@ -4,7 +4,7 @@ End-to-end machine learning project for used car price prediction, structured as
 
 ## Project Overview
 
-This repository contains one connected workflow across seven stages:
+This repository contains one connected workflow across eight stages:
 
 - `01-eda`: exploratory data analysis, quality checks, and feature-target insights
 - `02-baseline-modeling`: multi-model benchmark and best-model selection
@@ -13,6 +13,7 @@ This repository contains one connected workflow across seven stages:
 - `05-explainability`: permutation importance and explainability artifacts
 - `06-inference-api`: FastAPI-based inference service for live predictions
 - `07-data-validation`: reusable validation checks for incoming prediction data
+- `08-productionization`: model monitoring, retraining triggers, and lightweight deployment assets
 
 Dataset summary:
 
@@ -109,6 +110,13 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Checks payloads for missing fields, unknown fields, numeric coercion, and out-of-range values
 - Feeds validation results into the inference API before prediction
 
+### Stage 08 - Productionization
+
+- Monitors current model quality against Stage 05 RMSE baseline
+- Applies retraining logic when performance or drift thresholds are breached
+- Publishes a deployment-ready model artifact consumed by Stage 06
+- Generates lightweight deployment assets (Dockerfile, docker-compose, run scripts)
+
 ## Current Best Result (Stage 05 Explainability)
 
 - Best Model: Gradient Boosting
@@ -174,6 +182,9 @@ used-car-price-intelligence-platform/
 `-- 07-data-validation/
     |-- README.md
     `-- stage7_data_validation.py
+`-- 08-productionization/
+  |-- README.md
+  `-- stage8_productionization.py
 ```
 
 ## Methods and Evaluation
@@ -236,6 +247,7 @@ python run_all_stages.py
    - Execute Stage 4 (ensemble modeling) → saves ensemble metrics, model, and figure
    - Execute Stage 5 (explainability) → saves importance outputs and model artifact
   - Execute Stage 7 (validation) → saves validation profile and sample report
+  - Execute Stage 8 (productionization) → saves monitoring report, deployment model, and deployment assets
   - Validate Stage 6 API → confirms model and validation layer load correctly
 
 3. Or run manually in Jupyter:
@@ -260,6 +272,9 @@ jupyter notebook
 
   Then run Stage 7 validation profile generation:
    - `python 07-data-validation/stage7_data_validation.py`
+
+  Then run Stage 8 productionization:
+   - `python 08-productionization/stage8_productionization.py`
 
   Then open one of these in the browser:
   - `http://127.0.0.1:8000/`

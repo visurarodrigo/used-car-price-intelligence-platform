@@ -2,9 +2,9 @@
 
 ## 1. Project Summary
 
-This project predicts used car prices with a full machine learning workflow. It starts with data exploration, moves through data cleaning and model building, and ends with ensemble modeling, explainability, and data validation.
+This project predicts used car prices with a full machine learning workflow. It starts with data exploration, moves through data cleaning and model building, and ends with ensemble modeling, explainability, data validation, and productionization.
 
-The project is organized in seven stages:
+The project is organized in eight stages:
 
 1. Stage 01 - Exploratory data analysis and cleaning
 2. Stage 02 - Baseline modeling
@@ -13,6 +13,7 @@ The project is organized in seven stages:
 5. Stage 05 - Explainability
 6. Stage 06 - Inference API
 7. Stage 07 - Automated data validation
+8. Stage 08 - Productionization (monitoring, retraining, and lightweight deployment)
 
 The goal is simple: build a model that predicts car prices accurately and explain why the model makes those predictions.
 
@@ -170,7 +171,7 @@ Main results:
 
 - Added health, feature schema, single prediction, and batch prediction endpoints
 - Added a root landing route so the base URL returns a helpful JSON message instead of 404
-- Loads Stage 05 model artifact at startup
+- Loads Stage 08 deployed model artifact when available, with Stage 05 fallback
 - Aligns incoming request data to the Stage 1 cleaned feature schema
 - Returns unknown input fields in the response for easier debugging
 
@@ -184,13 +185,46 @@ Key artifacts:
 
 This stage adds validation checks for incoming data before it is passed into the modeling pipeline.
 
-Planned focus:
+Main results:
 
 - Schema validation for required fields
 - Type and range checks for numeric inputs
 - Missing-value thresholds and rejection rules
-- Categorical value checks against the trained feature space
-- Clear error messages for invalid or unexpected data
+- Unknown-field detection and payload sparsity warnings
+- Validation profile and sample report artifacts for API integration
+
+Key artifacts:
+
+- [Stage 07 script](07-data-validation/stage7_data_validation.py)
+- [Validation profile](07-data-validation/outputs/metrics/data_validation_profile.json)
+- [Sample validation report](07-data-validation/outputs/metrics/sample_validation_report.json)
+
+### Stage 08 - Productionization
+
+This stage operationalizes the model with monitoring, retraining logic, and deployment-ready assets.
+
+Main results:
+
+- Added RMSE baseline monitoring against Stage 05 metrics
+- Added lightweight feature-shift monitoring between reference and current evaluation data
+- Added retraining decision logic with threshold-based triggers
+- Published a deployment-ready model artifact for the inference API
+- Generated lightweight deployment files (Dockerfile, docker-compose, and run scripts)
+
+Monitoring snapshot:
+
+- Current Test R2: 0.9676234321930117
+- Current Test RMSE: 1667.0919691154925
+- Current Test MAE: 923.5545603562045
+- RMSE delta vs Stage 05 baseline: 0.0
+- Retraining triggered: No
+
+Key artifacts:
+
+- [Stage 08 script](08-productionization/stage8_productionization.py)
+- [Monitoring report](08-productionization/outputs/metrics/monitoring_report.json)
+- [Deployment manifest](08-productionization/outputs/metrics/deployment_manifest.json)
+- [Deployed model](08-productionization/outputs/models/deployed_model.joblib)
 
 ## 4. Final Result Summary
 
@@ -200,6 +234,8 @@ Planned focus:
 | Stage 04 | Best ensemble: Gradient Boosting | 0.9676234321930117 | 1667.0919691154925 | 923.5545603562045 |
 | Stage 05 | Explainable Gradient Boosting Regressor | 0.9676234321930117 | 1667.0919691154925 | 923.5545603562045 |
 | Stage 06 | Inference API for live prediction | N/A | N/A | N/A |
+| Stage 07 | Automated payload validation before inference | N/A | N/A | N/A |
+| Stage 08 | Monitoring + deployment-ready model (no retraining needed) | 0.9676234321930117 | 1667.0919691154925 | 923.5545603562045 |
 
 Overall improvement:
 
@@ -228,6 +264,7 @@ These files are the best place to quickly review charts, metrics files, and mode
 6. Stage 05 explains the final model with permutation importance.
 7. Stage 06 serves the trained model through API endpoints for live prediction.
 8. Stage 07 validates new input data before inference.
+9. Stage 08 monitors production quality, retrains when needed, and prepares deployment assets.
 
 You can run the full pipeline with:
 
@@ -247,15 +284,8 @@ The simple message is:
 
 - I built an end-to-end machine learning pipeline for used car price prediction.
 - I improved the model from a strong baseline to a better ensemble.
-- I validated the work with metrics, plots, and a final explainability stage.
+- I finished the project with validation, monitoring/retraining logic, and a lightweight deployment layer.
 
-## 9. Next Steps
-
-Possible future improvements:
-
-1. Add model monitoring and retraining logic.
-2. Add a lightweight deployment layer.
-
-## 10. Author
+## Author
 
 Visura Rodrigo

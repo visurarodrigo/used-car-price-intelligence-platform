@@ -4,7 +4,9 @@ This stage exposes the trained model as a lightweight API for live price predict
 
 ## What It Uses
 
-- Model artifact: `05-explainability/outputs/models/stage5_explainable_model.joblib`
+- Model artifact precedence:
+  1. `08-productionization/outputs/models/deployed_model.joblib`
+  2. `05-explainability/outputs/models/stage5_explainable_model.joblib` (fallback)
 - Feature schema source: `01-eda/outputs/processed/usedcars_stage1.csv`
 
 The API expects Stage 1 cleaned feature names (numeric and one-hot encoded columns).
@@ -60,5 +62,6 @@ Open interactive docs:
 - Validation warnings are returned in the prediction response.
 - Unknown features are ignored by default, but they are still reported by the validation endpoint.
 - If you retrain with new features, restart the API so it reloads the new schema/model.
+- Running Stage 08 refreshes the preferred deployed model artifact used by this API.
 - If loading the saved model fails due environment compatibility, the API automatically retrains a compatible Gradient Boosting model from the Stage 1 cleaned dataset.
 - If you added the root endpoint recently, stop and restart Uvicorn so the browser picks up the new code.
