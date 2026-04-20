@@ -1,4 +1,5 @@
 from __future__ import annotations
+"""Build and apply reusable feature validation rules for inference payloads."""
 
 import json
 import math
@@ -70,6 +71,7 @@ def numeric_summary(series: pd.Series) -> dict[str, Any]:
 
 @lru_cache(maxsize=1)
 def load_validation_profile() -> dict[str, Any]:
+    # Cache profile generation because the schema is static within one run.
     df = load_cleaned_data()
     feature_names = split_features(df)
 
@@ -91,6 +93,7 @@ def save_json(path: Path, payload: dict[str, Any]) -> None:
 
 
 def _coerce_numeric(value: Any, feature_name: str) -> float:
+    # Enforce numeric finite values so downstream model math is safe.
     try:
         numeric_value = float(value)
     except (TypeError, ValueError) as exc:
@@ -103,6 +106,7 @@ def _coerce_numeric(value: Any, feature_name: str) -> float:
 
 
 def validate_features(features: dict[str, Any], *, strict: bool = False) -> dict[str, Any]:
+    # Validate, coerce, and align incoming features to the full training schema.
     profile = load_validation_profile()
     expected_features = profile["features"]
     feature_stats = profile["feature_stats"]
@@ -115,6 +119,7 @@ def validate_features(features: dict[str, Any], *, strict: bool = False) -> dict
     validated_features: dict[str, float] = {}
 
     for feature_name, value in features.items():
+        # Unknown fields are warnings by default and errors in strict mode.
         if feature_name not in aligned_features:
             unknown_features.append(feature_name)
             message = f"Unknown feature '{feature_name}' ignored."
@@ -129,6 +134,7 @@ def validate_features(features: dict[str, Any], *, strict: bool = False) -> dict
         aligned_features[feature_name] = numeric_value
 
         stat = feature_stats[feature_name]
+        # Flag values outside observed training ranges without hard-failing.
         if numeric_value < stat["min"] or numeric_value > stat["max"]:
             warnings.append(
                 f"Feature '{feature_name}' is outside the observed training range "
@@ -139,6 +145,7 @@ def validate_features(features: dict[str, Any], *, strict: bool = False) -> dict
             warnings.append(f"Feature '{feature_name}' is binary in training data but received {numeric_value}.")
 
     for feature_name in expected_features:
+        # Missing fields are defaulted to 0.0 to keep the API shape stable.
         if feature_name not in features:
             missing_features.append(feature_name)
 
@@ -182,6 +189,7 @@ def validate_features(features: dict[str, Any], *, strict: bool = False) -> dict
 
 
 def validate_batch(rows: list[dict[str, Any]], *, strict: bool = False) -> dict[str, Any]:
+    # Run row-wise validation and aggregate the overall batch status.
     row_reports = []
     for index, row in enumerate(rows):
         report = validate_features(row, strict=strict)
@@ -197,6 +205,7 @@ def validate_batch(rows: list[dict[str, Any]], *, strict: bool = False) -> dict[
 
 
 def build_sample_report() -> dict[str, Any]:
+    # Validate the sample API payload so users can inspect a concrete report.
     if not SAMPLE_PAYLOAD_PATH.exists():
         return {
             "sample_payload_found": False,

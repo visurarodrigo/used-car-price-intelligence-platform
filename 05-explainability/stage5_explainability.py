@@ -1,4 +1,5 @@
 from __future__ import annotations
+"""Stage 05 entry point: train explainable model and export explanation artifacts."""
 
 import json
 from pathlib import Path

@@ -1,4 +1,5 @@
 from __future__ import annotations
+"""Monitor model quality, decide retraining, and emit lightweight deployment assets."""
 
 import json
 from pathlib import Path
@@ -34,6 +35,7 @@ MEAN_SHIFT_ALERT_RATIO = 0.30
 
 
 def ensure_output_dirs() -> None:
+    # Create output folders before writing metrics, models, and deployment files.
     METRICS_DIR.mkdir(parents=True, exist_ok=True)
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     DEPLOYMENT_DIR.mkdir(parents=True, exist_ok=True)
@@ -45,6 +47,7 @@ def save_json(path: Path, payload: dict[str, Any]) -> None:
 
 
 def load_data() -> tuple[pd.DataFrame, np.ndarray]:
+    # Load Stage 01 cleaned data as the shared source of truth for this stage.
     if not DATA_PATH.exists():
         raise FileNotFoundError(f"Cleaned dataset not found: {DATA_PATH}")
 
@@ -67,6 +70,7 @@ def build_model() -> GradientBoostingRegressor:
 
 
 def evaluate(model: Any, X_test: pd.DataFrame, y_test: np.ndarray) -> dict[str, float]:
+    # Evaluate with the same metrics used in earlier modeling stages.
     y_pred = model.predict(X_test)
     return {
         "r2": float(r2_score(y_test, y_pred)),
@@ -76,6 +80,7 @@ def evaluate(model: Any, X_test: pd.DataFrame, y_test: np.ndarray) -> dict[str, 
 
 
 def compute_mean_shift_ratio(X_train: pd.DataFrame, X_test: pd.DataFrame) -> dict[str, Any]:
+    # Use simple z-score mean shifts as a lightweight drift proxy.
     train_mean = X_train.mean(numeric_only=True)
     test_mean = X_test.mean(numeric_only=True)
     train_std = X_train.std(numeric_only=True, ddof=0).replace(0.0, 1e-9)
@@ -97,6 +102,7 @@ def compute_mean_shift_ratio(X_train: pd.DataFrame, X_test: pd.DataFrame) -> dic
 
 
 def load_stage5_baseline_rmse() -> float | None:
+    # Baseline RMSE is used as the production alert anchor.
     if not STAGE5_METRICS_PATH.exists():
         return None
 
@@ -111,6 +117,7 @@ def load_stage5_baseline_rmse() -> float | None:
 
 
 def load_or_rebuild_stage5_model(X_train: pd.DataFrame, y_train: np.ndarray) -> tuple[Any, str]:
+    # Prefer loading the saved Stage 05 model; rebuild if artifact is missing/incompatible.
     if not STAGE5_MODEL_PATH.exists():
         model = build_model()
         model.fit(X_train, y_train)
@@ -133,6 +140,7 @@ def choose_deployed_model(
     X_full: pd.DataFrame,
     y_full: np.ndarray,
 ) -> tuple[Any, dict[str, Any]]:
+    # Trigger retraining only when performance degrades or drift crosses thresholds.
     rmse_alert_level = baseline_rmse * (1.0 + RMSE_ALERT_RATIO)
     rmse_degraded = current_metrics["rmse"] > rmse_alert_level
     shift_alert = mean_shift["shifted_feature_ratio"] > MEAN_SHIFT_ALERT_RATIO
@@ -172,6 +180,7 @@ def choose_deployed_model(
 
 
 def write_deployment_files() -> dict[str, str]:
+    # Generate simple container/run assets to make local deployment straightforward.
     dockerfile_path = DEPLOYMENT_DIR / "Dockerfile"
     compose_path = DEPLOYMENT_DIR / "docker-compose.yml"
     run_ps1_path = DEPLOYMENT_DIR / "start_api.ps1"
@@ -216,6 +225,7 @@ CMD ["uvicorn", "stage6_inference_api:app", "--host", "0.0.0.0", "--port", "8000
 
 
 def main() -> int:
+    # End-to-end Stage 08 flow: monitor, decide, deploy, and publish manifests.
     ensure_output_dirs()
 
     X, y = load_data()

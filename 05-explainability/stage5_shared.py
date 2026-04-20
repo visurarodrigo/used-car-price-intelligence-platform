@@ -1,4 +1,5 @@
 from __future__ import annotations
+"""Shared Stage 05 utilities for training, evaluation, and explainability outputs."""
 
 import json
 from pathlib import Path

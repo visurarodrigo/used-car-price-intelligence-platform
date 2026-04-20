@@ -1,4 +1,5 @@
 from __future__ import annotations
+"""Serve real-time predictions with schema-aligned validation and model fallback loading."""
 
 import importlib.util
 from pathlib import Path
@@ -13,6 +14,7 @@ from sklearn.ensemble import GradientBoostingRegressor
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+# Prefer Stage 08 deployed model, then fall back to Stage 05 explainable artifact.
 MODEL_CANDIDATE_PATHS = [
     PROJECT_ROOT / "08-productionization" / "outputs" / "models" / "deployed_model.joblib",
     PROJECT_ROOT / "05-explainability" / "outputs" / "models" / "stage5_explainable_model.joblib",
@@ -23,6 +25,7 @@ TARGET_COLUMN = "price"
 
 STAGE7_MODULE_PATH = VALIDATION_DIR / "stage7_data_validation.py"
 
+# Load Stage 07 validation helpers dynamically to avoid import-path coupling.
 _STAGE7_SPEC = importlib.util.spec_from_file_location("stage7_data_validation", STAGE7_MODULE_PATH)
 if _STAGE7_SPEC is None or _STAGE7_SPEC.loader is None:
     raise FileNotFoundError(f"Validation module not found: {STAGE7_MODULE_PATH}")
@@ -43,18 +46,21 @@ VALIDATION_PROFILE: dict[str, Any] = {}
 
 
 class PredictRequest(BaseModel):
+    # A single prediction payload aligned to Stage 01 cleaned feature names.
     features: dict[str, Any] = Field(
         ..., description="Feature-value mapping using Stage 1 cleaned feature names"
     )
 
 
 class BatchPredictRequest(BaseModel):
+    # Multiple rows in one call for simple client-side throughput gains.
     rows: list[dict[str, Any]] = Field(
         ..., description="List of feature-value mappings using Stage 1 cleaned feature names"
     )
 
 
 class ValidateRequest(BaseModel):
+    # Validation-only request for checking payload quality before prediction.
     features: dict[str, Any] = Field(
         ..., description="Feature-value mapping using Stage 1 cleaned feature names"
     )
@@ -73,6 +79,7 @@ def _to_float(value: Any, feature_name: str) -> float:
 
 
 def _prepare_row(features: dict[str, Any], *, strict: bool = False) -> tuple[pd.DataFrame, dict[str, Any]]:
+    # Validate and align a payload into the exact model feature order.
     if not FEATURE_COLUMNS:
         raise RuntimeError("Feature schema is not loaded.")
 
@@ -91,11 +98,13 @@ def _load_runtime_artifacts() -> None:
     global LOADED_MODEL_PATH
     global VALIDATION_PROFILE
 
+    # Pick the first available model artifact based on configured precedence.
     model_path = next((path for path in MODEL_CANDIDATE_PATHS if path.exists()), None)
     if model_path is None:
         checked_paths = [str(path.relative_to(PROJECT_ROOT)) for path in MODEL_CANDIDATE_PATHS]
         raise FileNotFoundError(f"Model not found in any candidate path: {checked_paths}")
 
+    # Profile-derived feature schema keeps API and validation behavior synchronized.
     VALIDATION_PROFILE = load_validation_profile()
     feature_columns = list(VALIDATION_PROFILE["features"])
 
@@ -133,6 +142,7 @@ def _load_runtime_artifacts() -> None:
 
 @app.on_event("startup")
 def startup_event() -> None:
+    # Warm-load model and schema once when the API process starts.
     _load_runtime_artifacts()
 
 
@@ -215,6 +225,7 @@ def predict_batch(request: BatchPredictRequest) -> dict[str, Any]:
     validation_reports: list[dict[str, Any]] = []
 
     try:
+        # Validate and align each row independently, then score in one matrix call.
         for row in request.rows:
             vector, validation = _prepare_row(row)
             frames.append(vector)

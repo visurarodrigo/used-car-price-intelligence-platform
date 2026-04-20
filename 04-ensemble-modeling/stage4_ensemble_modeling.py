@@ -1,4 +1,5 @@
 from __future__ import annotations
+"""Train and compare ensemble strategies, then save the best Stage 04 model."""
 
 import json
 from pathlib import Path

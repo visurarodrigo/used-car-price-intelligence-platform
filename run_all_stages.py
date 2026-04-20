@@ -1,4 +1,5 @@
 from __future__ import annotations
+"""Run all project stages in order, then validate API runtime artifacts."""
 
 import subprocess
 import sys
