@@ -41,6 +41,13 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Numerical and categorical behavior vs `price`
 - Correlation and outlier-focused inspection
 - Exported visuals in a structured output layout
+
+  ![Missing Value Percentage](01-eda/outputs/overview/missing-value-percentage.png)
+
+  ![Price Distribution and Boxplot](01-eda/outputs/overview/price-distribution-and-boxplot.png)
+
+  ![Correlation Heatmap](01-eda/outputs/bivariate/correlation-heatmap.png)
+
 - **Full data cleaning pipeline**:
   - One-hot encodes categorical features
   - Removes rows with missing target
@@ -65,6 +72,10 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Preprocessing: scaling for linear models (no imputation—data already clean)
 - Saves model, metrics, and comparison tables under `02-baseline-modeling/outputs/`
 
+  ![Model Comparison](02-baseline-modeling/outputs/figures/model_comparison_bars.png)
+
+  ![Best Model Diagnostics](02-baseline-modeling/outputs/figures/best_model_diagnostics.png)
+
 ### Stage 03 - Model Refinement
 
 - Loads pre-cleaned data from Stage 01 (same centralized dataset as Stage 02)
@@ -77,6 +88,10 @@ This project builds a data-driven pricing intelligence workflow to improve consi
   - Predicted vs Actual
   - Residual diagnostics (scatter + distribution)
 - Loads Stage 02 baseline metrics for performance comparison
+
+  ![Predicted vs Actual Car Prices](03-model-refinement/outputs/figures/predicted_vs_actual.png)
+
+  ![Residual Plot](03-model-refinement/outputs/figures/residual_diagnostics.png)
 
 ### Stage 04 - Ensemble Modeling
 
@@ -91,11 +106,17 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Persists comparison metrics, best-model artifact, and prediction diagnostic figure
 - Compares Stage 04 best RMSE against Stage 02 best benchmark
 
+  ![Ensemble Predicted vs Actual](04-ensemble-modeling/outputs/figures/ensemble_predicted_vs_actual.png)
+
 ### Stage 05 - Explainability
 
 - Retrains the winning Stage 04 model in the current environment for compatibility
 - Generates permutation importance to explain which features drive predictions
 - Saves feature importance tables and diagnostic plots
+
+  ![Feature Importance](05-explainability/outputs/figures/feature_importance.png)
+
+  ![Predicted vs Actual](05-explainability/outputs/figures/prediction_scatter.png)
 
 ### Stage 06 - Inference API
 
@@ -116,6 +137,7 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Applies retraining logic when performance or drift thresholds are breached
 - Publishes a deployment-ready model artifact consumed by Stage 06
 - Generates lightweight deployment assets (Dockerfile, docker-compose, run scripts)
+- No plot preview: this stage focuses on monitoring and deployment assets.
 
 ## Current Best Result (Stage 05 Explainability)
 
