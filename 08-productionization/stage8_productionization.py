@@ -22,7 +22,6 @@ STAGE5_METRICS_PATH = PROJECT_ROOT / "05-explainability" / "outputs" / "metrics"
 OUTPUT_DIR = Path(__file__).resolve().parent / "outputs"
 METRICS_DIR = OUTPUT_DIR / "metrics"
 MODELS_DIR = OUTPUT_DIR / "models"
-DEPLOYMENT_DIR = OUTPUT_DIR / "deployment"
 
 MONITORING_REPORT_PATH = METRICS_DIR / "monitoring_report.json"
 DEPLOYMENT_INFO_PATH = METRICS_DIR / "deployment_manifest.json"
@@ -38,7 +37,6 @@ def ensure_output_dirs() -> None:
     # Create output folders before writing metrics, models, and deployment files.
     METRICS_DIR.mkdir(parents=True, exist_ok=True)
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
-    DEPLOYMENT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def save_json(path: Path, payload: dict[str, Any]) -> None:
@@ -179,51 +177,6 @@ def choose_deployed_model(
     return deployed_model, decision
 
 
-def write_deployment_files() -> dict[str, str]:
-    # Generate simple container/run assets to make local deployment straightforward.
-    dockerfile_path = DEPLOYMENT_DIR / "Dockerfile"
-    compose_path = DEPLOYMENT_DIR / "docker-compose.yml"
-    run_ps1_path = DEPLOYMENT_DIR / "start_api.ps1"
-    run_sh_path = DEPLOYMENT_DIR / "start_api.sh"
-
-    dockerfile_path.write_text(
-        """FROM python:3.11-slim
-
-WORKDIR /app
-COPY . /app
-
-RUN pip install --no-cache-dir pandas numpy scikit-learn joblib fastapi uvicorn
-
-EXPOSE 8000
-
-CMD ["uvicorn", "stage6_inference_api:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "06-inference-api"]
-""",
-        encoding="utf-8",
-    )
-
-    compose_path.write_text(
-        """version: '3.9'\nservices:\n  used-car-api:\n    build:\n      context: ../..\n      dockerfile: 08-productionization/outputs/deployment/Dockerfile\n    image: used-car-price-intelligence:latest\n    ports:\n      - \"8000:8000\"\n    restart: unless-stopped\n""",
-        encoding="utf-8",
-    )
-
-    run_ps1_path.write_text(
-        """python -m uvicorn stage6_inference_api:app --host 0.0.0.0 --port 8000 --app-dir 06-inference-api\n""",
-        encoding="utf-8",
-    )
-
-    run_sh_path.write_text(
-        """#!/usr/bin/env bash\npython -m uvicorn stage6_inference_api:app --host 0.0.0.0 --port 8000 --app-dir 06-inference-api\n""",
-        encoding="utf-8",
-    )
-
-    return {
-        "dockerfile": dockerfile_path.relative_to(PROJECT_ROOT).as_posix(),
-        "docker_compose": compose_path.relative_to(PROJECT_ROOT).as_posix(),
-        "run_script_powershell": run_ps1_path.relative_to(PROJECT_ROOT).as_posix(),
-        "run_script_bash": run_sh_path.relative_to(PROJECT_ROOT).as_posix(),
-    }
-
-
 def main() -> int:
     # End-to-end Stage 08 flow: monitor, decide, deploy, and publish manifests.
     ensure_output_dirs()
@@ -255,7 +208,6 @@ def main() -> int:
     )
 
     joblib.dump(deployed_model, DEPLOYED_MODEL_PATH)
-    deployment_files = write_deployment_files()
 
     monitoring_report = {
         "stage": "Stage 08 - Productionization",
@@ -271,9 +223,9 @@ def main() -> int:
     deployment_manifest = {
         "stage": "Stage 08 - Productionization",
         "deployed_model_path": DEPLOYED_MODEL_PATH.relative_to(PROJECT_ROOT).as_posix(),
-        "deployment_files": deployment_files,
         "api_entrypoint": "06-inference-api/stage6_inference_api.py",
         "default_port": 8000,
+        "deployment_note": "Use the root-level Dockerfile and GitHub Actions workflow for containerized deployment.",
     }
 
     save_json(MONITORING_REPORT_PATH, monitoring_report)
