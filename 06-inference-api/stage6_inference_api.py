@@ -116,7 +116,7 @@ def _load_runtime_artifacts() -> None:
     try:
         model = joblib.load(model_path)
         MODEL_SOURCE = "saved-artifact"
-    except ModuleNotFoundError:
+    except Exception:
         # If pickle compatibility breaks across sklearn versions, retrain a compatible model.
         X = schema_df.drop(columns=[TARGET_COLUMN])
         y = schema_df[TARGET_COLUMN].to_numpy()
