@@ -1,4 +1,7 @@
-﻿# Used Car Price Intelligence Platform
+﻿
+# Used Car Price Intelligence Platform
+
+[![CI/CD Pipeline](https://github.com/visurarodrigo/used-car-price-intelligence-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/visurarodrigo/used-car-price-intelligence-platform/actions/workflows/ci.yml)
 
 End-to-end machine learning project for used car price prediction, structured as a professional 8-stage workflow from analysis to inference API and data validation.
 
@@ -13,7 +16,7 @@ This repository contains one connected workflow across eight stages:
 - `05-explainability`: permutation importance and explainability artifacts
 - `06-inference-api`: FastAPI-based inference service for live predictions
 - `07-data-validation`: reusable validation checks for incoming prediction data
-- `08-productionization`: model monitoring, retraining triggers, and lightweight deployment assets
+- `08-productionization`: model monitoring, retraining triggers, and deployment readiness
 
 Dataset summary:
 
@@ -136,8 +139,7 @@ This project builds a data-driven pricing intelligence workflow to improve consi
 - Monitors current model quality against Stage 05 RMSE baseline
 - Applies retraining logic when performance or drift thresholds are breached
 - Publishes a deployment-ready model artifact consumed by Stage 06
-- Generates lightweight deployment assets (Dockerfile, docker-compose, run scripts)
-- No plot preview: this stage focuses on monitoring and deployment assets.
+- Relies on the root-level `Dockerfile` and GitHub Actions workflow for containerized deployment (no longer generates redundant local deployment scripts)
 
 ## Current Best Result (Stage 05 Explainability)
 
@@ -150,13 +152,42 @@ Reference improvement vs Stage 02 best RMSE: -174.70
 
 Source: `05-explainability/outputs/metrics/stage5_model_metrics.json`
 
+## 🐳 Docker Setup (Inference API)
+The Stage 06 Inference API is fully containerized. You can run the live prediction service with a single command, without installing any Python dependencies locally.
+
+### Build and Run
+```bash
+# Build the Docker image
+docker build -t used-car-api .
+
+# Run the container
+docker run -p 8000:8000 used-car-api
+```
+
+### Access the API
+- **API Documentation (Swagger UI):** http://localhost:8000/docs
+- **Health Check:** http://localhost:8000/health
+- **Feature Schema:** http://localhost:8000/features
+
 ## Project Structure
 
 ```text
 used-car-price-intelligence-platform/
+|
+|-- .dockerignore
+|-- .github/
+|   `-- workflows/
+|       `-- ci.yml
+|-- Dockerfile
+|-- requirements.txt
 |-- README.md
+|-- run_all_stages.py
+|-- project_report.md
+|
 |-- data/
+|   |-- README.md
 |   `-- usedcars.csv
+|
 |-- 01-eda/
 |   |-- README.md
 |   |-- OUTPUT_PREVIEWS.md
@@ -166,6 +197,7 @@ used-car-price-intelligence-platform/
 |       |-- numerical/
 |       |-- categorical/
 |       `-- bivariate/
+|
 |-- 02-baseline-modeling/
 |   |-- README.md
 |   |-- OUTPUT_PREVIEWS.md
@@ -174,39 +206,48 @@ used-car-price-intelligence-platform/
 |       |-- figures/
 |       |-- metrics/
 |       `-- models/
-`-- 03-model-refinement/
+|
+|-- 03-model-refinement/
+|   |-- README.md
+|   |-- OUTPUT_PREVIEWS.md
+|   |-- stage3_model_refinement.ipynb
+|   `-- outputs/
+|       `-- figures/
+|
+|-- 04-ensemble-modeling/
+|   |-- README.md
+|   |-- OUTPUT_PREVIEWS.md
+|   |-- stage4_ensemble_modeling.py
+|   `-- outputs/
+|       |-- figures/
+|       |-- metrics/
+|       `-- models/
+|
+|-- 05-explainability/
+|   |-- README.md
+|   |-- OUTPUT_PREVIEWS.md
+|   |-- stage5_explainability.py
+|   |-- stage5_shared.py
+|   `-- outputs/
+|       |-- figures/
+|       |-- metrics/
+|       `-- models/
+|
+|-- 06-inference-api/
+|   |-- README.md
+|   |-- sample_predict_payload.json
+|   `-- stage6_inference_api.py
+|
+|-- 07-data-validation/
+|   |-- README.md
+|   `-- stage7_data_validation.py
+|
+`-- 08-productionization/
     |-- README.md
-    |-- OUTPUT_PREVIEWS.md
-    |-- stage3_model_refinement.ipynb
+    |-- stage8_productionization.py
     `-- outputs/
-        `-- figures/
-`-- 04-ensemble-modeling/
-    |-- README.md
-    |-- OUTPUT_PREVIEWS.md
-    |-- stage4_ensemble_modeling.py
-    `-- outputs/
-        |-- figures/
         |-- metrics/
         `-- models/
-`-- 05-explainability/
-  |-- README.md
-  |-- OUTPUT_PREVIEWS.md
-  |-- stage5_explainability.py
-  |-- stage5_shared.py
-  `-- outputs/
-    |-- figures/
-    |-- metrics/
-    `-- models/
-`-- 06-inference-api/
-    |-- README.md
-    |-- sample_predict_payload.json
-    `-- stage6_inference_api.py
-`-- 07-data-validation/
-    |-- README.md
-    `-- stage7_data_validation.py
-`-- 08-productionization/
-  |-- README.md
-  `-- stage8_productionization.py
 ```
 
 ## Methods and Evaluation
@@ -244,16 +285,14 @@ live prediction endpoint
 
 ## How to Run
 
+### Option 1: Using Docker (Recommended for API)
+The easiest way to run the inference API is via Docker. See the [Docker Setup](#-docker-setup-inference-api) section above.
+
+### Option 2: Local Execution (Full Pipeline)
 1. Install dependencies:
 
 ```bash
-pip install pandas numpy matplotlib seaborn scikit-learn joblib jupyter
-```
-
-For Stage 06 API usage:
-
-```bash
-pip install fastapi uvicorn
+pip install -r requirements.txt
 ```
 
 2. Run all stages with one command:
@@ -268,9 +307,9 @@ python run_all_stages.py
    - Execute Stage 3 (refinement) → uses cleaned data
    - Execute Stage 4 (ensemble modeling) → saves ensemble metrics, model, and figure
    - Execute Stage 5 (explainability) → saves importance outputs and model artifact
-  - Execute Stage 7 (validation) → saves validation profile and sample report
-  - Execute Stage 8 (productionization) → saves monitoring report, deployment model, and deployment assets
-  - Validate Stage 6 API → confirms model and validation layer load correctly
+   - Execute Stage 7 (validation) → saves validation profile and sample report
+   - Execute Stage 8 (productionization) → saves monitoring report, deployment model, and deployment assets
+   - Validate Stage 6 API → confirms model and validation layer load correctly
 
 3. Or run manually in Jupyter:
 
@@ -303,7 +342,6 @@ jupyter notebook
   - `http://127.0.0.1:8000/docs`
   - `http://127.0.0.1:8000/health`
   - `http://127.0.0.1:8000/features`
-
 
 ## Author
 
