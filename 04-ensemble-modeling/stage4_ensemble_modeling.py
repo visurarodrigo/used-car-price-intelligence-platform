@@ -1,5 +1,19 @@
 from __future__ import annotations
-"""Train and compare ensemble strategies, then save the best Stage 04 model."""
+"""
+Stage 04: Ensemble Modeling
+
+This stage focuses on improving the predictive performance of the used car price model
+by combining multiple base learners (Random Forest and Gradient Boosting) into an
+ensemble. We compare three primary strategies:
+1. Single Model: Using either RF or GBR independently.
+2. Weighted Blend: A simple weighted average of RF and GBR, where weights are
+   optimized using Out-Of-Fold (OOF) predictions to prevent data leakage.
+3. Stacking Regressor: A meta-learning approach where a final estimator (Ridge)
+   learns how to best combine the predictions of the base learners.
+
+The goal is to find the strategy that minimizes the Root Mean Squared Error (RMSE)
+on the test set and persist the best performing model for downstream use.
+"""
 
 import json
 from pathlib import Path
@@ -14,10 +28,12 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import KFold, train_test_split
 
 
+# Path configuration for data and artifact management
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = PROJECT_ROOT / "01-eda" / "outputs" / "processed" / "usedcars_stage1.csv"
 STAGE2_BEST_METRICS = PROJECT_ROOT / "02-baseline-modeling" / "outputs" / "metrics" / "best_model_metrics.json"
 
+# Output directories for metrics, models, and visualizations
 OUTPUT_DIR = Path(__file__).resolve().parent / "outputs"
 METRICS_DIR = OUTPUT_DIR / "metrics"
 MODELS_DIR = OUTPUT_DIR / "models"
@@ -27,19 +43,31 @@ RANDOM_STATE = 42
 
 
 def ensure_output_dirs() -> None:
-    # Create output folders once so all artifacts can be saved safely.
+    """
+    Ensures that the required directory structure for saving outputs exists.
+    Creates parent directories if they are missing.
+    """
     METRICS_DIR.mkdir(parents=True, exist_ok=True)
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    # Keep RMSE in a reusable helper so every stage reports the same metric consistently.
+    """
+    Calculates the Root Mean Squared Error (RMSE).
+    RMSE is used as the primary metric for model comparison as it penalizes
+    larger errors more heavily than MAE.
+    """
     return float(np.sqrt(mean_squared_error(y_true, y_pred)))
 
 
 def evaluate(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]:
-    # Package the standard regression metrics into one place for comparison output.
+    """
+    Computes a set of standard regression metrics to evaluate model performance.
+
+    Returns:
+        A dictionary containing R2 (coefficient of determination), RMSE, and MAE.
+    """
     return {
         "r2": float(r2_score(y_true, y_pred)),
         "rmse": rmse(y_true, y_pred),
@@ -52,10 +80,20 @@ def find_best_blend_weight(
     rf_preds: np.ndarray,
     gbr_preds: np.ndarray,
 ) -> tuple[float, float]:
-    # Grid-search the blend weight on out-of-fold predictions to avoid leakage.
+    """
+    Performs a grid search to find the optimal weight for blending GBR and RF predictions.
+
+    The blend is calculated as: Prediction = weight * GBR + (1 - weight) * RF.
+    This search is performed on Out-Of-Fold (OOF) predictions to ensure the weight
+    is chosen based on how models generalize to unseen data, avoiding overfitting.
+
+    Returns:
+        A tuple containing the best weight for GBR and the corresponding RMSE.
+    """
     best_weight = 0.5
     best_rmse = float("inf")
 
+    # Test 21 different weights from 0.0 to 1.0 in increments of 0.05
     for weight in np.linspace(0.0, 1.0, 21):
         preds = weight * gbr_preds + (1.0 - weight) * rf_preds
         score = rmse(y_true, preds)
@@ -67,7 +105,10 @@ def find_best_blend_weight(
 
 
 def plot_predictions(y_true: np.ndarray, y_pred: np.ndarray, out_path: Path) -> None:
-    # Plot a quick fit check for the chosen ensemble winner.
+    """
+    Creates a scatter plot of Actual vs Predicted prices to visually assess model fit.
+    The red dashed line represents a perfect prediction (y=x).
+    """
     plt.figure(figsize=(8, 6))
     plt.scatter(y_true, y_pred, alpha=0.7, edgecolors="none")
     bounds = [min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())]
@@ -83,6 +124,7 @@ def plot_predictions(y_true: np.ndarray, y_pred: np.ndarray, out_path: Path) -> 
 def main() -> int:
     ensure_output_dirs()
 
+    # 1. Data Loading and Preparation
     # Load the fully cleaned dataset exported by Stage 01.
     if not DATA_PATH.exists():
         raise FileNotFoundError(f"Cleaned dataset not found: {DATA_PATH}")
@@ -94,7 +136,8 @@ def main() -> int:
     X = df.drop(columns=["price"])
     y = df["price"].to_numpy()
 
-    # Keep split settings stable for reproducible stage-to-stage comparisons.
+    # Split into training and testing sets.
+    # The random_state is kept constant across stages for fair comparison.
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
@@ -102,7 +145,9 @@ def main() -> int:
         random_state=RANDOM_STATE,
     )
 
-    # Train strong tree-based base models first.
+    # 2. Base Model Training
+    # We use Random Forest (RF) and Gradient Boosting (GBR) as they are powerful
+    # non-linear learners that often capture different aspects of the data.
     rf = RandomForestRegressor(
         n_estimators=500,
         min_samples_leaf=2,
@@ -116,7 +161,7 @@ def main() -> int:
         random_state=RANDOM_STATE,
     )
 
-    # Fit both base learners before comparing them and combining their outputs.
+    # Fit base learners on the full training set to evaluate their standalone performance.
     rf.fit(X_train, y_train)
     gbr.fit(X_train, y_train)
 
@@ -126,17 +171,20 @@ def main() -> int:
     rf_metrics = evaluate(y_test, rf_pred_test)
     gbr_metrics = evaluate(y_test, gbr_pred_test)
 
-    # Build out-of-fold predictions for honest blend-weight selection.
+    # 3. Weighted Blend Strategy (using OOF)
+    # To find the best blending weight without leaking test data, we use K-Fold Cross Validation.
+    # We generate 'Out-Of-Fold' (OOF) predictions for the entire training set.
     kf = KFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
     rf_oof = np.zeros_like(y_train, dtype=float)
     gbr_oof = np.zeros_like(y_train, dtype=float)
 
-    # Build out-of-fold predictions so the blend weight is selected on unseen folds.
+    # For each fold, train on 4 parts and predict the 5th.
     for train_idx, valid_idx in kf.split(X_train):
         X_fold_train = X_train.iloc[train_idx]
         X_fold_valid = X_train.iloc[valid_idx]
         y_fold_train = y_train[train_idx]
 
+        # Slightly smaller model for the folds to speed up the OOF process.
         rf_fold = RandomForestRegressor(
             n_estimators=300,
             min_samples_leaf=2,
@@ -156,11 +204,15 @@ def main() -> int:
         rf_oof[valid_idx] = rf_fold.predict(X_fold_valid)
         gbr_oof[valid_idx] = gbr_fold.predict(X_fold_valid)
 
+    # Optimize the blend weight based on these OOF predictions.
     best_weight, _ = find_best_blend_weight(y_train, rf_oof, gbr_oof)
     blend_pred_test = best_weight * gbr_pred_test + (1.0 - best_weight) * rf_pred_test
     blend_metrics = evaluate(y_test, blend_pred_test)
 
-    # Stacking learns a meta-model over base model outputs.
+    # 4. Stacking Strategy
+    # Stacking uses a 'meta-model' (here, a Ridge regressor) to learn the optimal
+    # combination of base model predictions. StackingRegressor handles the
+    # internal cross-validation to prevent leakage.
     stacking_model = StackingRegressor(
         estimators=[
             ("rf", RandomForestRegressor(n_estimators=300, random_state=RANDOM_STATE, n_jobs=-1)),
@@ -183,6 +235,8 @@ def main() -> int:
     stacking_pred_test = stacking_model.predict(X_test)
     stacking_metrics = evaluate(y_test, stacking_pred_test)
 
+    # 5. Model Comparison and Selection
+    # Aggregate all candidate models and their performance.
     models = {
         "Random Forest": (rf_metrics, rf),
         "Gradient Boosting": (gbr_metrics, gbr),
@@ -201,11 +255,12 @@ def main() -> int:
             }
         )
 
+    # Sort by RMSE ascending (lowest error is best).
     comparison_df = pd.DataFrame(comparison_rows).sort_values("test_rmse", ascending=True)
     comparison_path = METRICS_DIR / "ensemble_comparison.csv"
     comparison_df.to_csv(comparison_path, index=False)
 
-    # Pick the winner using RMSE (lower is better).
+    # Select the winning model.
     best_row = comparison_df.iloc[0]
     best_model_name = str(best_row["model"])
 
@@ -217,8 +272,8 @@ def main() -> int:
         "blend_weight_gbr": float(best_weight),
     }
 
+    # Compare against Stage 02 (Baseline) to quantify the gain from ensembling.
     if STAGE2_BEST_METRICS.exists():
-        # Carry Stage 02 metrics forward so the ensemble gain is easy to report.
         with STAGE2_BEST_METRICS.open("r", encoding="utf-8") as f:
             stage2 = json.load(f)
         best_payload["stage2_best_model"] = stage2.get("best_model")
@@ -229,8 +284,8 @@ def main() -> int:
     with best_json_path.open("w", encoding="utf-8") as f:
         json.dump(best_payload, f, indent=2)
 
-    # Persist the winning model in a single, stable artifact path.
-    # Save whichever candidate won, but keep the artifact path stable for downstream use.
+    # 6. Artifact Persistence
+    # Save the winning model to a consistent path for downstream inference/evaluation.
     if best_model_name == "Random Forest":
         y_best = rf_pred_test
         joblib.dump(rf, MODELS_DIR / "best_ensemble_model.joblib")
@@ -239,6 +294,7 @@ def main() -> int:
         joblib.dump(gbr, MODELS_DIR / "best_ensemble_model.joblib")
     elif best_model_name == "Weighted Blend (GBR/RF)":
         y_best = blend_pred_test
+        # For a blend, we need to save both base models and the optimal weight.
         blend_bundle = {
             "rf": rf,
             "gbr": gbr,
@@ -249,6 +305,7 @@ def main() -> int:
         y_best = stacking_pred_test
         joblib.dump(stacking_model, MODELS_DIR / "best_ensemble_model.joblib")
 
+    # Save visualization of the winner.
     plot_predictions(y_test, y_best, FIGURES_DIR / "ensemble_predicted_vs_actual.png")
 
     print("Stage 04 complete.")
