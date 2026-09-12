@@ -1,12 +1,18 @@
 from __future__ import annotations
-"""Serve real-time predictions with schema-aligned validation and model fallback loading."""
+"""
+Used Car Price Inference API.
+
+This module implements a FastAPI service that serves real-time price predictions.
+It integrates with the project's data validation profile (Stage 07) to ensure
+incoming requests match the expected schema and handles model loading with
+automated fallback to retraining if artifacts are missing or incompatible.
+"""
 
 import importlib.util
 from pathlib import Path
 from typing import Any
 
 import joblib
-import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -70,16 +76,19 @@ class ValidateRequest(BaseModel):
     )
 
 
-def _to_float(value: Any, feature_name: str) -> float:
-    """Coerce incoming feature values to float for model compatibility."""
-    try:
-        return float(value)
-    except (TypeError, ValueError) as exc:
-        raise ValueError(f"Feature '{feature_name}' must be numeric. Got: {value!r}") from exc
 
 
 def _prepare_row(features: dict[str, Any], *, strict: bool = False) -> tuple[pd.DataFrame, dict[str, Any]]:
-    # Validate and align a payload into the exact model feature order.
+    """
+    Validate and align a payload into the exact model feature order.
+
+    Args:
+        features: The raw feature mapping.
+        strict: Whether to enforce strict schema validation.
+
+    Returns:
+        A tuple containing a single-row DataFrame and the validation report.
+    """
     if not FEATURE_COLUMNS:
         raise RuntimeError("Feature schema is not loaded.")
 
@@ -92,6 +101,13 @@ def _prepare_row(features: dict[str, Any], *, strict: bool = False) -> tuple[pd.
 
 
 def _load_runtime_artifacts() -> None:
+    """
+    Warm-load the model, feature schema, and validation profile into memory.
+
+    Tries to load a pre-saved joblib artifact. If loading fails due to version
+    mismatch or missing files, it attempts to retrain a fallback model using
+    the processed dataset from Stage 01.
+    """
     global MODEL
     global FEATURE_COLUMNS
     global MODEL_SOURCE
@@ -142,12 +158,13 @@ def _load_runtime_artifacts() -> None:
 
 @app.on_event("startup")
 def startup_event() -> None:
-    # Warm-load model and schema once when the API process starts.
+    """FastAPI startup hook to initialize runtime artifacts."""
     _load_runtime_artifacts()
 
 
 @app.get("/")
 def root() -> dict[str, Any]:
+    """API root endpoint providing useful links and basic status."""
     return {
         "message": "Used Car Price Inference API is running.",
         "docs": "/docs",
@@ -159,6 +176,7 @@ def root() -> dict[str, Any]:
 
 @app.get("/health")
 def health() -> dict[str, Any]:
+    """Health check endpoint reporting model source and schema status."""
     if MODEL is None or not FEATURE_COLUMNS:
         raise HTTPException(status_code=500, detail="Model or schema not loaded")
 
@@ -175,6 +193,7 @@ def health() -> dict[str, Any]:
 
 @app.get("/features")
 def get_features() -> dict[str, Any]:
+    """Returns the list of features the model expects for prediction."""
     if not FEATURE_COLUMNS:
         raise HTTPException(status_code=500, detail="Feature schema not loaded")
 
@@ -187,6 +206,7 @@ def get_features() -> dict[str, Any]:
 
 @app.post("/validate")
 def validate(request: ValidateRequest) -> dict[str, Any]:
+    """Validates a feature set against the project's validation profile."""
     try:
         report = validate_features(request.features, strict=request.strict)
     except ValueError as exc:
@@ -197,6 +217,7 @@ def validate(request: ValidateRequest) -> dict[str, Any]:
 
 @app.post("/predict")
 def predict(request: PredictRequest) -> dict[str, Any]:
+    """Predicts the price for a single car based on provided features."""
     if MODEL is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
 
@@ -216,6 +237,7 @@ def predict(request: PredictRequest) -> dict[str, Any]:
 
 @app.post("/predict-batch")
 def predict_batch(request: BatchPredictRequest) -> dict[str, Any]:
+    """Predicts prices for multiple cars in a single batch request."""
     if MODEL is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
     if not request.rows:
