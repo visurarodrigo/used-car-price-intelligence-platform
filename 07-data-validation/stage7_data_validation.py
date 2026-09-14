@@ -1,5 +1,12 @@
 from __future__ import annotations
-"""Build and apply reusable feature validation rules for inference payloads."""
+"""
+Build and apply reusable feature validation rules for inference payloads.
+
+This module generates a data validation profile from the cleaned training dataset
+and provides functions to validate incoming inference requests against this profile.
+It ensures that the features provided to the model are numeric, finite, and
+reasonably within the ranges observed during training.
+"""
 
 import json
 import math
@@ -11,6 +18,7 @@ import numpy as np
 import pandas as pd
 
 
+# --- Project Paths ---
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = PROJECT_ROOT / "01-eda" / "outputs" / "processed" / "usedcars_stage1.csv"
 SAMPLE_PAYLOAD_PATH = PROJECT_ROOT / "06-inference-api" / "sample_predict_payload.json"
@@ -20,15 +28,28 @@ METRICS_DIR = OUTPUT_DIR / "metrics"
 PROFILE_PATH = METRICS_DIR / "data_validation_profile.json"
 SAMPLE_REPORT_PATH = METRICS_DIR / "sample_validation_report.json"
 
+# --- Constants ---
 TARGET_COLUMN = "price"
+# Ratio of missing features beyond which a sparse payload warning is triggered
 MISSING_FEATURE_RATIO_WARNING = 0.35
 
 
 def ensure_output_dirs() -> None:
+    """Create necessary output directories for validation metrics if they don't exist."""
     METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_cleaned_data() -> pd.DataFrame:
+    """
+    Load the processed training dataset used to establish the validation baseline.
+
+    Returns:
+        pd.DataFrame: The cleaned training dataset.
+
+    Raises:
+        FileNotFoundError: If the processed dataset is not found at DATA_PATH.
+        ValueError: If the expected target column is missing from the dataset.
+    """
     if not DATA_PATH.exists():
         raise FileNotFoundError(f"Cleaned dataset not found: {DATA_PATH}")
 
@@ -39,10 +60,28 @@ def load_cleaned_data() -> pd.DataFrame:
 
 
 def split_features(df: pd.DataFrame) -> list[str]:
+    """
+    Separate the feature columns from the target column in the dataframe.
+
+    Args:
+        df: The dataframe containing both features and target.
+
+    Returns:
+        A list of strings containing only the feature column names.
+    """
     return [column for column in df.columns if column != TARGET_COLUMN]
 
 
 def to_jsonable(value: Any) -> Any:
+    """
+    Convert NumPy types to standard Python types to ensure JSON serializability.
+
+    Args:
+        value: The value to convert (can be NumPy scalars, arrays, or Pandas objects).
+
+    Returns:
+        The value converted to a JSON-compatible Python type.
+    """
     if isinstance(value, (np.integer, np.floating)):
         return value.item()
     if isinstance(value, np.ndarray):
@@ -53,6 +92,18 @@ def to_jsonable(value: Any) -> Any:
 
 
 def numeric_summary(series: pd.Series) -> dict[str, Any]:
+    """
+    Calculate descriptive statistics for a numeric column to be used in validation.
+
+    Args:
+        series: The pandas Series to summarize.
+
+    Returns:
+        A dictionary containing min, max, median, mean, std, unique count, and binary flag.
+
+    Raises:
+        ValueError: If the column contains no valid numeric values.
+    """
     clean_series = pd.to_numeric(series, errors="coerce").dropna()
     if clean_series.empty:
         raise ValueError(f"Column '{series.name}' does not contain valid numeric values.")
@@ -71,6 +122,15 @@ def numeric_summary(series: pd.Series) -> dict[str, Any]:
 
 @lru_cache(maxsize=1)
 def load_validation_profile() -> dict[str, Any]:
+    """
+    Generate and cache a validation profile based on the cleaned training data.
+
+    The profile includes the expected features and their respective numeric summaries.
+    Caching prevents re-calculating these statistics on every validation call.
+
+    Returns:
+        A dictionary containing the schema source, target column, feature list, and feature stats.
+    """
     # Cache profile generation because the schema is static within one run.
     df = load_cleaned_data()
     feature_names = split_features(df)
@@ -88,11 +148,31 @@ def load_validation_profile() -> dict[str, Any]:
 
 
 def save_json(path: Path, payload: dict[str, Any]) -> None:
+    """
+    Save a dictionary to a JSON file with indentation for readability.
+
+    Args:
+        path: The destination file path.
+        payload: The dictionary to save.
+    """
     with path.open("w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=2)
 
 
 def _coerce_numeric(value: Any, feature_name: str) -> float:
+    """
+    Attempt to convert a value to a finite float.
+
+    Args:
+        value: The value to coerce.
+        feature_name: The name of the feature (used for error reporting).
+
+    Returns:
+        The value as a float.
+
+    Raises:
+        ValueError: If the value cannot be converted to a float or is not finite (NaN/Inf).
+    """
     # Enforce numeric finite values so downstream model math is safe.
     try:
         numeric_value = float(value)
@@ -106,11 +186,27 @@ def _coerce_numeric(value: Any, feature_name: str) -> float:
 
 
 def validate_features(features: dict[str, Any], *, strict: bool = False) -> dict[str, Any]:
+    """
+    Validate, coerce, and align incoming features to the training schema.
+
+    This function checks for unknown features, missing features, and values that
+    fall outside the ranges observed during training.
+
+    Args:
+        features: A dictionary of feature names and their corresponding values.
+        strict: If True, unknown or missing features are treated as errors. If False,
+                they are treated as warnings.
+
+    Returns:
+        A validation report dictionary containing validity status, feature counts,
+        aligned features, and any errors or warnings encountered.
+    """
     # Validate, coerce, and align incoming features to the full training schema.
     profile = load_validation_profile()
     expected_features = profile["features"]
     feature_stats = profile["feature_stats"]
 
+    # Pre-fill aligned features with defaults (0.0) to ensure the model receives a complete vector
     aligned_features = {feature: 0.0 for feature in expected_features}
     unknown_features: list[str] = []
     missing_features: list[str] = []
@@ -119,7 +215,7 @@ def validate_features(features: dict[str, Any], *, strict: bool = False) -> dict
     validated_features: dict[str, float] = {}
 
     for feature_name, value in features.items():
-        # Unknown fields are warnings by default and errors in strict mode.
+        # 1. Check for unknown features (fields not present in training data)
         if feature_name not in aligned_features:
             unknown_features.append(feature_name)
             message = f"Unknown feature '{feature_name}' ignored."
@@ -129,26 +225,29 @@ def validate_features(features: dict[str, Any], *, strict: bool = False) -> dict
                 warnings.append(message)
             continue
 
+        # 2. Coerce to numeric and ensure finiteness
         numeric_value = _coerce_numeric(value, feature_name)
         validated_features[feature_name] = numeric_value
         aligned_features[feature_name] = numeric_value
 
+        # 3. Range validation: check if value is within [min, max] observed in training
         stat = feature_stats[feature_name]
-        # Flag values outside observed training ranges without hard-failing.
         if numeric_value < stat["min"] or numeric_value > stat["max"]:
             warnings.append(
                 f"Feature '{feature_name}' is outside the observed training range "
                 f"[{stat['min']}, {stat['max']}]."
             )
 
+        # 4. Binary validation: check if a binary feature received a non-binary value
         if stat["is_binary"] and numeric_value not in (0.0, 1.0):
             warnings.append(f"Feature '{feature_name}' is binary in training data but received {numeric_value}.")
 
+    # 5. Check for missing features (expected fields not provided in payload)
     for feature_name in expected_features:
-        # Missing fields are defaulted to 0.0 to keep the API shape stable.
         if feature_name not in features:
             missing_features.append(feature_name)
 
+    # 6. Evaluate missing feature severity
     missing_ratio = len(missing_features) / len(expected_features) if expected_features else 0.0
     if missing_features:
         message = (
@@ -159,6 +258,7 @@ def validate_features(features: dict[str, Any], *, strict: bool = False) -> dict
         else:
             warnings.append(message)
 
+    # 7. Trigger sparse payload warning if too many features are missing
     if missing_ratio >= MISSING_FEATURE_RATIO_WARNING:
         warnings.append(
             f"{len(missing_features)} of {len(expected_features)} features were missing "
@@ -189,6 +289,17 @@ def validate_features(features: dict[str, Any], *, strict: bool = False) -> dict
 
 
 def validate_batch(rows: list[dict[str, Any]], *, strict: bool = False) -> dict[str, Any]:
+    """
+    Run row-wise validation and aggregate the overall batch status.
+
+    Args:
+        rows: A list of feature dictionaries to validate.
+        strict: Whether to treat unknown/missing features as errors.
+
+    Returns:
+        A dictionary containing the batch size, strict mode flag, overall validity,
+        and individual row reports.
+    """
     # Run row-wise validation and aggregate the overall batch status.
     row_reports = []
     for index, row in enumerate(rows):
@@ -205,6 +316,13 @@ def validate_batch(rows: list[dict[str, Any]], *, strict: bool = False) -> dict[
 
 
 def build_sample_report() -> dict[str, Any]:
+    """
+    Validate a sample API payload to provide a concrete example of a validation report.
+
+    Returns:
+        A dictionary containing whether the sample was found, the path to the sample,
+        and the resulting validation report.
+    """
     # Validate the sample API payload so users can inspect a concrete report.
     if not SAMPLE_PAYLOAD_PATH.exists():
         return {
@@ -224,6 +342,12 @@ def build_sample_report() -> dict[str, Any]:
 
 
 def main() -> int:
+    """
+    Main execution entry point for generating the validation profile and sample report.
+
+    Returns:
+        0 on successful execution.
+    """
     ensure_output_dirs()
     profile = load_validation_profile()
     save_json(PROFILE_PATH, profile)
