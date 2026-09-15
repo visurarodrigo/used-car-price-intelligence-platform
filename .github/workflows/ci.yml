@@ -1,47 +1,59 @@
 name: CI/CD Pipeline
 
+# Define the events that trigger the workflow
 on:
   push:
+    # Trigger on pushes to main or master branches
     branches: [ main, master ]
   pull_request:
+    # Trigger on pull requests targeting main or master branches
     branches: [ main, master ]
 
 jobs:
+  # 'test' job handles linting and basic deployment verification
   test:
+    # Use the latest Ubuntu runner provided by GitHub Actions
     runs-on: ubuntu-latest
-    
+
     steps:
+    # Step 1: Checkout the repository code so the workflow can access it
     - name: Checkout code
       uses: actions/checkout@v3
-    
+
+    # Step 2: Set up the Python environment
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
+    # Step 3: Install necessary Python packages from requirements.txt and flake8 for linting
     - name: Install dependencies
       run: |
         pip install --upgrade pip
         pip install -r requirements.txt
         pip install flake8
-    
+
+    # Step 4: Run linting checks to ensure code quality and style consistency
     - name: Lint with flake8
       run: |
         # Stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # Exit-zero treats all errors as warnings (good for portfolio projects)
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    
+
+    # Step 5: Build the Docker image based on the Dockerfile in the root directory
     - name: Build Docker image
       run: docker build -t used-car-api .
-    
+
+    # Step 6: Run the Docker container and verify it starts correctly via a health check
     - name: Test Docker container starts and health check
       run: |
+        # Start the container in detached mode and map port 8000
         docker run -d -p 8000:8000 --name test-container used-car-api
-        # Wait for the API and the fallback retraining to finish
+        # Wait for the API and the fallback retraining to finish initialization
         sleep 15
-        # Test the health endpoint
+        # Test the health endpoint; if it fails, the build fails
         curl -f http://localhost:8000/health || exit 1
-        # Clean up
+        # Clean up the test container to leave the runner environment clean
         docker stop test-container
         docker rm test-container
