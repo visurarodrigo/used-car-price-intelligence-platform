@@ -1,19 +1,15 @@
 from __future__ import annotations
 """
 Stage 05: Model Explainability and Feature Importance.
-
-This stage focuses on interpreting the model's behavior. While previous stages
-concentrated on accuracy, this stage uses Permutation Importance to identify
-which features (e.g., year, mileage, brand) are the primary drivers of the
-predicted used car price.
-
-The results are exported as a CSV for raw data, plots for visual analysis,
-and a JSON summary for metadata tracking.
+...
 """
 
 import json
+import mlflow
+import mlflow.sklearn
 
 import joblib
+...
 
 from stage5_shared import (
     IMPORTANCE_PATH,
@@ -36,6 +32,11 @@ from stage5_shared import (
 def main() -> int:
     # Initialize necessary output directories to avoid FileNotFoundError when saving
     ensure_output_dirs()
+
+    # Setup MLflow
+    mlflow.set_tracking_uri('sqlite:///mlflow.db')
+    mlflow.set_experiment('used-car-price-intelligence')
+    mlflow.sklearn.autolog()
 
     # Train a fresh Stage 05-compatible model in the current environment.
     # We use a model that supports permutation importance for transparency.

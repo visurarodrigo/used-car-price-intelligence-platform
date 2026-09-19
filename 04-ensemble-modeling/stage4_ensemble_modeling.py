@@ -22,6 +22,8 @@ import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import mlflow
+import mlflow.sklearn
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor, StackingRegressor
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -123,6 +125,11 @@ def plot_predictions(y_true: np.ndarray, y_pred: np.ndarray, out_path: Path) -> 
 
 def main() -> int:
     ensure_output_dirs()
+
+    # Setup MLflow
+    mlflow.set_tracking_uri('sqlite:///mlflow.db')
+    mlflow.set_experiment('used-car-price-intelligence')
+    mlflow.sklearn.autolog()
 
     # 1. Data Loading and Preparation
     # Load the fully cleaned dataset exported by Stage 01.
