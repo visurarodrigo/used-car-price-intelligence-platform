@@ -11,6 +11,9 @@ ensemble. We compare three primary strategies:
 3. Stacking Regressor: A meta-learning approach where a final estimator (Ridge)
    learns how to best combine the predictions of the base learners.
 
+All experiments, including hyperparameters and performance metrics, are tracked
+using MLflow to ensure reproducibility and easy comparison between strategies.
+
 The goal is to find the strategy that minimizes the Root Mean Squared Error (RMSE)
 on the test set and persist the best performing model for downstream use.
 """
@@ -126,9 +129,10 @@ def plot_predictions(y_true: np.ndarray, y_pred: np.ndarray, out_path: Path) -> 
 def main() -> int:
     ensure_output_dirs()
 
-    # Setup MLflow
+    # Setup MLflow tracking to log hyperparameters and metrics for each model run.
     mlflow.set_tracking_uri('sqlite:///mlflow.db')
     mlflow.set_experiment('used-car-price-intelligence')
+    # autolog automatically tracks sklearn model parameters and metrics.
     mlflow.sklearn.autolog()
 
     # 1. Data Loading and Preparation
@@ -169,6 +173,7 @@ def main() -> int:
     )
 
     # Fit base learners on the full training set to evaluate their standalone performance.
+    # These runs are automatically logged to MLflow via autolog.
     rf.fit(X_train, y_train)
     gbr.fit(X_train, y_train)
 
