@@ -1,0 +1,81 @@
+artifact_path: file:///C:/Users/a12u/OneDrive/Desktop/Courses/Own Projects/used-car-price-intelligence-platform/mlruns/1/models/m-e5b8ec269f0a4bc891ec899769216127/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.4
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+is_signature_from_type_hint: false
+mlflow_version: 3.16.0
+model_id: m-e5b8ec269f0a4bc891ec899769216127
+model_size_bytes: 25491
+model_uuid: m-e5b8ec269f0a4bc891ec899769216127
+prompts: null
+run_id: 40055471816140e6a3490048a4d00b25
+signature:
+  inputs: '[{"type": "long", "name": "symboling", "required": true}, {"type": "long",
+    "name": "normalized-losses", "required": true}, {"type": "double", "name": "wheel-base",
+    "required": true}, {"type": "double", "name": "length", "required": true}, {"type":
+    "double", "name": "width", "required": true}, {"type": "double", "name": "height",
+    "required": true}, {"type": "long", "name": "curb-weight", "required": true},
+    {"type": "long", "name": "engine-size", "required": true}, {"type": "double",
+    "name": "bore", "required": true}, {"type": "double", "name": "stroke", "required":
+    true}, {"type": "double", "name": "compression-ratio", "required": true}, {"type":
+    "double", "name": "horsepower", "required": true}, {"type": "double", "name":
+    "peak-rpm", "required": true}, {"type": "long", "name": "city-mpg", "required":
+    true}, {"type": "long", "name": "highway-mpg", "required": true}, {"type": "double",
+    "name": "city-L/100km", "required": true}, {"type": "long", "name": "diesel",
+    "required": true}, {"type": "long", "name": "gas", "required": true}, {"type":
+    "boolean", "name": "make_audi", "required": true}, {"type": "boolean", "name":
+    "make_bmw", "required": true}, {"type": "boolean", "name": "make_chevrolet", "required":
+    true}, {"type": "boolean", "name": "make_dodge", "required": true}, {"type": "boolean",
+    "name": "make_honda", "required": true}, {"type": "boolean", "name": "make_isuzu",
+    "required": true}, {"type": "boolean", "name": "make_jaguar", "required": true},
+    {"type": "boolean", "name": "make_mazda", "required": true}, {"type": "boolean",
+    "name": "make_mercedes-benz", "required": true}, {"type": "boolean", "name": "make_mercury",
+    "required": true}, {"type": "boolean", "name": "make_mitsubishi", "required":
+    true}, {"type": "boolean", "name": "make_nissan", "required": true}, {"type":
+    "boolean", "name": "make_peugot", "required": true}, {"type": "boolean", "name":
+    "make_plymouth", "required": true}, {"type": "boolean", "name": "make_porsche",
+    "required": true}, {"type": "boolean", "name": "make_renault", "required": true},
+    {"type": "boolean", "name": "make_saab", "required": true}, {"type": "boolean",
+    "name": "make_subaru", "required": true}, {"type": "boolean", "name": "make_toyota",
+    "required": true}, {"type": "boolean", "name": "make_volkswagen", "required":
+    true}, {"type": "boolean", "name": "make_volvo", "required": true}, {"type": "boolean",
+    "name": "aspiration_turbo", "required": true}, {"type": "boolean", "name": "num-of-doors_two",
+    "required": true}, {"type": "boolean", "name": "body-style_hardtop", "required":
+    true}, {"type": "boolean", "name": "body-style_hatchback", "required": true},
+    {"type": "boolean", "name": "body-style_sedan", "required": true}, {"type": "boolean",
+    "name": "body-style_wagon", "required": true}, {"type": "boolean", "name": "drive-wheels_fwd",
+    "required": true}, {"type": "boolean", "name": "drive-wheels_rwd", "required":
+    true}, {"type": "boolean", "name": "engine-location_rear", "required": true},
+    {"type": "boolean", "name": "engine-type_l", "required": true}, {"type": "boolean",
+    "name": "engine-type_ohc", "required": true}, {"type": "boolean", "name": "engine-type_ohcf",
+    "required": true}, {"type": "boolean", "name": "engine-type_ohcv", "required":
+    true}, {"type": "boolean", "name": "engine-type_rotor", "required": true}, {"type":
+    "boolean", "name": "num-of-cylinders_five", "required": true}, {"type": "boolean",
+    "name": "num-of-cylinders_four", "required": true}, {"type": "boolean", "name":
+    "num-of-cylinders_six", "required": true}, {"type": "boolean", "name": "num-of-cylinders_three",
+    "required": true}, {"type": "boolean", "name": "num-of-cylinders_twelve", "required":
+    true}, {"type": "boolean", "name": "num-of-cylinders_two", "required": true},
+    {"type": "boolean", "name": "fuel-system_2bbl", "required": true}, {"type": "boolean",
+    "name": "fuel-system_4bbl", "required": true}, {"type": "boolean", "name": "fuel-system_idi",
+    "required": true}, {"type": "boolean", "name": "fuel-system_mfi", "required":
+    true}, {"type": "boolean", "name": "fuel-system_mpfi", "required": true}, {"type":
+    "boolean", "name": "fuel-system_spdi", "required": true}, {"type": "boolean",
+    "name": "fuel-system_spfi", "required": true}, {"type": "boolean", "name": "horsepower-binned_Low",
+    "required": true}, {"type": "boolean", "name": "horsepower-binned_Medium", "required":
+    true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "float64", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-09-20 01:39:01.880156'
