@@ -123,17 +123,27 @@ def _load_runtime_artifacts() -> None:
     global LOADED_MODEL_PATH
     global VALIDATION_PROFILE
 
-    # 1. Try loading from MLflow Model Registry (Production)
+    # 1. Try loading from a clean champion folder (CI/CD compatible)
     try:
-        mlflow.set_tracking_uri('sqlite:///mlflow.db')
-        model = mlflow.pyfunc.load_model("models:/used-car-price-champion/Production")
-        MODEL_SOURCE = "mlflow-registry-production"
-        model_path = None
+        champion_path = PROJECT_ROOT / "models" / "champion"
+        if champion_path.exists():
+            model = mlflow.pyfunc.load_model(str(champion_path))
+            MODEL_SOURCE = "champion-artifact"
+            model_path = champion_path
+        else:
+            raise FileNotFoundError("Champion folder not found.")
     except Exception as e:
-        # Log failure and try local fallbacks
-        print(f"MLflow registry load failed: {e}. Trying local artifacts...")
-        model = None
-        model_path = next((path for path in MODEL_CANDIDATE_PATHS if path.exists()), None)
+        # Fallback to MLflow Model Registry (Production)
+        try:
+            mlflow.set_tracking_uri('sqlite:///mlflow.db')
+            model = mlflow.pyfunc.load_model("models:/used-car-price-champion/Production")
+            MODEL_SOURCE = "mlflow-registry-production"
+            model_path = None
+        except Exception as registry_e:
+            # Log failure and try local artifacts
+            print(f"MLflow registry load failed: {registry_e}. Trying local artifacts...")
+            model = None
+            model_path = next((path for path in MODEL_CANDIDATE_PATHS if path.exists()), None)
 
     # Profile-derived feature schema keeps API and validation behavior synchronized.
     VALIDATION_PROFILE = load_validation_profile()
