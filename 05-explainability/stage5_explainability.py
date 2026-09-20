@@ -33,7 +33,8 @@ def main() -> int:
     # Initialize necessary output directories to avoid FileNotFoundError when saving
     ensure_output_dirs()
 
-    # Setup MLflow
+    # Setup MLflow for experiment tracking.
+    # This logs hyperparameters, metrics, and the model automatically using autolog.
     mlflow.set_tracking_uri('sqlite:///mlflow.db')
     mlflow.set_experiment('used-car-price-intelligence')
     mlflow.sklearn.autolog()
