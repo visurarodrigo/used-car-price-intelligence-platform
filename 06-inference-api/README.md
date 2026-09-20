@@ -2,11 +2,25 @@
 
 This stage exposes the trained model as a lightweight API for live price prediction.
 
+## Model Management & MLflow Integration
+
+The API is designed to be the final consumption point of the ML lifecycle. It employs a sophisticated loading strategy to ensure high availability and version control:
+
+1.  **MLflow Model Registry (Preferred)**: The API first attempts to load the "Champion" model directly from the MLflow Model Registry (`models:/used-car-price-champion/Production`). This allows for zero-downtime model updates via the Registry.
+2.  **Local Artifacts (Fallback)**: If the registry is unavailable, it falls back to local `.joblib` files (Stage 08 deployed model or Stage 05 explainable model).
+3.  **Automatic Retraining (Emergency Fallback)**: In case of environment/version incompatibility, the API can automatically retrain a compatible Gradient Boosting model from the Stage 1 cleaned dataset to ensure the service remains online.
+
+**To manage models via MLflow:**
+Run the following command from the project root to view and promote models to Production:
+`mlflow ui --backend-store-uri sqlite:///mlflow.db`
+Then open `http://127.0.0.1:5000` in your browser.
+
 ## What It Uses
 
 - Model artifact precedence:
-  1. `08-productionization/outputs/models/deployed_model.joblib`
-  2. `05-explainability/outputs/models/stage5_explainable_model.joblib` (fallback)
+  1. MLflow Model Registry (`Production` stage)
+  2. `08-productionization/outputs/models/deployed_model.joblib`
+  3. `05-explainability/outputs/models/stage5_explainable_model.joblib` (fallback)
 - Feature schema source: `01-eda/outputs/processed/usedcars_stage1.csv`
 
 The API expects Stage 1 cleaned feature names (numeric and one-hot encoded columns).

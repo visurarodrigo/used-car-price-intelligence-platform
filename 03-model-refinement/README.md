@@ -26,6 +26,18 @@ Transform baseline models into production-grade predictive solutions by:
 - **Advanced Validation**: R², MSE, MAE, and residual analysis across folds
 - **Diagnostic Visualization**: Prediction scatter plots and residual error patterns
 
+## Experiment Tracking (MLflow)
+
+Like Stage 2, this stage utilizes **MLflow** to track the refinement process:
+- **Run-Based Tracking**: Every experiment (Baseline, Poly2_Ridge, GridSearch) is logged as a named run.
+- **Nested Experiments**: The Grid Search process creates a parent run for the best results and child runs for each hyperparameter combination tested.
+- **Artifact Logging**: Diagnostic plots (`predicted_vs_actual.png` and `residual_diagnostics.png`) are logged directly as MLflow artifacts for easy retrieval.
+
+**To visualize the tuning process:**
+Run the following command from the project root:
+`mlflow ui --backend-store-uri sqlite:///mlflow.db`
+Then open `http://127.0.0.1:5000` in your browser.
+
 ## Output Structure
 
 All generated outputs are automatically saved to:

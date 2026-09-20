@@ -12,6 +12,18 @@ Explain the Stage 04 prediction model and generate explainability artifacts.
 - Generates permutation importance to explain feature influence
 - Saves feature importance tables and diagnostic plots
 
+## Experiment Tracking (MLflow)
+
+As with the previous modeling stages, **MLflow** is used to maintain a transparent record of the explainability process:
+- **Automatic Logging**: Uses `mlflow.sklearn.autolog()` to capture the parameters and metrics of the explainable model.
+- **Performance Comparison**: Logged metrics allow for a direct comparison between the "explainable" model and the high-performance ensemble from Stage 04.
+- **Traceability**: Ensures that the feature importance results are tied to a specific model version and dataset split.
+
+**To visualize the explainability results:**
+Run the following command from the project root:
+`mlflow ui --backend-store-uri sqlite:///mlflow.db`
+Then open `http://127.0.0.1:5000` in your browser.
+
 ## Files
 
 - `stage5_explainability.py`: trains the Stage 05 model and generates explainability artifacts

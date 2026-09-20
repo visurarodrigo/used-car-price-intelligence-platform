@@ -19,6 +19,18 @@ Build and evaluate ensemble strategies on top of the strongest Stage 02 models t
 - Saves best model and metrics artifacts
 - Compares Stage 04 best RMSE against Stage 02 best RMSE
 
+## Experiment Tracking (MLflow)
+
+Consistent with previous stages, **MLflow** is used to track the ensemble experiments:
+- **Automatic Tracking**: Uses `mlflow.sklearn.autolog()` to log hyperparameters and metrics for each base learner and ensemble model.
+- **Strategy Comparison**: Each ensemble candidate (Blending, Stacking, Single Models) is logged as a separate run to allow side-by-side performance analysis.
+- **Reproducibility**: The exact configuration of the ensemble (e.g., base learner counts, meta-learner type) is stored in the MLflow tracking server.
+
+**To visualize the ensemble results:**
+Run the following command from the project root:
+`mlflow ui --backend-store-uri sqlite:///mlflow.db`
+Then open `http://127.0.0.1:5000` in your browser.
+
 ## Files
 
 - `stage4_ensemble_modeling.py`: Main script for ensemble training and evaluation

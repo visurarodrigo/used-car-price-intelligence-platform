@@ -31,6 +31,18 @@ Build a regression benchmark pipeline that compares multiple model families, sel
 - **Automatic Best-Model Selection**: Based on test RMSE
 - **Artifact Persistence**: Comparison table, best-model metrics JSON, serialized model joblib
 
+## Experiment Tracking (MLflow)
+
+This stage integrates **MLflow** to ensure every model benchmark is reproducible:
+- **Automatic Logging**: Uses `mlflow.sklearn.autolog()` to capture hyperparameters and training metrics.
+- **Run Structure**: Each candidate model is logged as a named run within the `used-car-price-intelligence` experiment.
+- **Summary Run**: A final `Best_Model_Summary` run is created to store the winning model's artifacts and the global comparison table.
+
+**To visualize the benchmarks:**
+Run the following command from the project root:
+`mlflow ui --backend-store-uri sqlite:///mlflow.db`
+Then open `http://127.0.0.1:5000` in your browser.
+
 ## Output Structure
 
 All generated outputs are saved automatically to:
