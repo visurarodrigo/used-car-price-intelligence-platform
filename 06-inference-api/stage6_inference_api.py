@@ -13,7 +13,10 @@ from pathlib import Path
 from typing import Any
 
 import joblib
+import mlflow
+import mlflow.pyfunc
 import pandas as pd
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from sklearn.ensemble import GradientBoostingRegressor
@@ -42,7 +45,13 @@ _STAGE7_SPEC.loader.exec_module(_STAGE7_MODULE)
 load_validation_profile = _STAGE7_MODULE.load_validation_profile
 validate_features = _STAGE7_MODULE.validate_features
 
-app = FastAPI(title="Used Car Price Inference API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan handler to initialize runtime artifacts."""
+    _load_runtime_artifacts()
+    yield
+
+app = FastAPI(title="Used Car Price Inference API", version="1.0.0", lifespan=lifespan)
 
 MODEL: Any | None = None
 FEATURE_COLUMNS: list[str] = []
@@ -104,9 +113,9 @@ def _load_runtime_artifacts() -> None:
     """
     Warm-load the model, feature schema, and validation profile into memory.
 
-    Tries to load a pre-saved joblib artifact. If loading fails due to version
-    mismatch or missing files, it attempts to retrain a fallback model using
-    the processed dataset from Stage 01.
+    Tries to load the champion model from the MLflow Model Registry. If registry loading
+    fails, it falls back to local joblib artifacts. If all fails, it attempts to
+    retrain a fallback model using the processed dataset from Stage 01.
     """
     global MODEL
     global FEATURE_COLUMNS
@@ -114,11 +123,17 @@ def _load_runtime_artifacts() -> None:
     global LOADED_MODEL_PATH
     global VALIDATION_PROFILE
 
-    # Pick the first available model artifact based on configured precedence.
-    model_path = next((path for path in MODEL_CANDIDATE_PATHS if path.exists()), None)
-    if model_path is None:
-        checked_paths = [str(path.relative_to(PROJECT_ROOT)) for path in MODEL_CANDIDATE_PATHS]
-        raise FileNotFoundError(f"Model not found in any candidate path: {checked_paths}")
+    # 1. Try loading from MLflow Model Registry (Production)
+    try:
+        mlflow.set_tracking_uri('sqlite:///mlflow.db')
+        model = mlflow.pyfunc.load_model("models:/used-car-price-champion/Production")
+        MODEL_SOURCE = "mlflow-registry-production"
+        model_path = None
+    except Exception as e:
+        # Log failure and try local fallbacks
+        print(f"MLflow registry load failed: {e}. Trying local artifacts...")
+        model = None
+        model_path = next((path for path in MODEL_CANDIDATE_PATHS if path.exists()), None)
 
     # Profile-derived feature schema keeps API and validation behavior synchronized.
     VALIDATION_PROFILE = load_validation_profile()
@@ -129,22 +144,25 @@ def _load_runtime_artifacts() -> None:
 
     schema_df = pd.read_csv(SCHEMA_PATH)
 
-    try:
-        model = joblib.load(model_path)
-        MODEL_SOURCE = "saved-artifact"
-    except Exception:
-        # If pickle compatibility breaks across sklearn versions, retrain a compatible model.
-        X = schema_df.drop(columns=[TARGET_COLUMN])
-        y = schema_df[TARGET_COLUMN].to_numpy()
-        model = GradientBoostingRegressor(
-            n_estimators=500,
-            learning_rate=0.05,
-            max_depth=3,
-            random_state=42,
-        )
-        model.fit(X, y)
-        MODEL_SOURCE = "retrained-fallback"
-        model_path = None
+    if model is None:
+        try:
+            if model_path is None:
+                raise FileNotFoundError("No local model artifacts found.")
+            model = joblib.load(model_path)
+            MODEL_SOURCE = "saved-artifact"
+        except Exception:
+            # If pickle compatibility breaks across sklearn versions, retrain a compatible model.
+            X = schema_df.drop(columns=[TARGET_COLUMN])
+            y = schema_df[TARGET_COLUMN].to_numpy()
+            model = GradientBoostingRegressor(
+                n_estimators=500,
+                learning_rate=0.05,
+                max_depth=3,
+                random_state=42,
+            )
+            model.fit(X, y)
+            MODEL_SOURCE = "retrained-fallback"
+            model_path = None
 
     # Keep feature order aligned with the model when available.
     model_feature_names = getattr(model, "feature_names_in_", None)
@@ -154,12 +172,6 @@ def _load_runtime_artifacts() -> None:
     MODEL = model
     FEATURE_COLUMNS = feature_columns
     LOADED_MODEL_PATH = model_path
-
-
-@app.on_event("startup")
-def startup_event() -> None:
-    """FastAPI startup hook to initialize runtime artifacts."""
-    _load_runtime_artifacts()
 
 
 @app.get("/")
