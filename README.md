@@ -17,6 +17,7 @@ This repository contains one connected workflow across eight stages:
 - `06-inference-api`: FastAPI-based inference service for live predictions
 - `07-data-validation`: reusable validation checks for incoming prediction data
 - `08-productionization`: model monitoring, retraining triggers, and deployment readiness
+- `monitoring/`: MLflow experiment tracking, model registry, and Evidently data-drift monitoring (see [MLOps & Monitoring](#mlops--monitoring))
 
 Dataset summary:
 
@@ -152,6 +153,49 @@ Reference improvement vs Stage 02 best RMSE: -174.70
 
 Source: `05-explainability/outputs/metrics/stage5_model_metrics.json`
 
+## MLOps & Monitoring
+
+Beyond training, the project tracks experiments, versions its champion model, and monitors incoming data for drift.
+
+### Experiment Tracking: MLflow
+
+The Stage 02 and Stage 03 notebooks log every model as its own named run in the `used-car-price-intelligence` experiment (SQLite backend, scikit-learn autologging plus explicit CV and test metrics). Each run records hyperparameters, R²/RMSE/MAE, and the fitted model artifact. Grid Search is logged as a parent run with one nested child run per `alpha` value.
+
+![MLflow experiment runs](monitoring/screenshots/mlflow_ui.jpg)
+
+To browse the runs locally:
+
+```bash
+mlflow ui --backend-store-uri sqlite:///mlflow.db
+```
+
+### Model Registry
+
+The best model is registered in the MLflow Model Registry as `used-car-price-champion` and exported in MLflow format to `models/champion/` (`export_champion.py`).
+
+![MLflow Model Registry](monitoring/screenshots/mlflow_registry.jpg)
+
+### Data Drift Monitoring: Evidently AI
+
+`monitoring/drift_report.py` compares the training data (the reference) against a simulated production batch in which `engine-size`, `curb-weight`, and `horsepower` are deliberately shifted. It runs a per-feature statistical test with Evidently, saves an interactive HTML report and a JSON summary, and logs the results to a separate MLflow experiment (`used-car-price-monitoring`).
+
+**Result:** 3 of 68 features (4.4%) were flagged as drifted, exactly the three that were altered. All other features were correctly left unflagged. Dataset-level drift was not triggered, because Evidently's default threshold is 50% of columns.
+
+![Evidently drift summary](monitoring/screenshots/evidently_summary.jpg)
+
+![Feature distribution: curb-weight](monitoring/screenshots/evidently_feature.jpg)
+
+Full interactive report: [`monitoring/drift_report.html`](monitoring/drift_report.html) (download and open in a browser).
+
+This complements Stage 08: Stage 08 watches model error (RMSE) and triggers retraining, while the Evidently check watches the **input data** for shifts that would degrade the model before errors appear.
+
+To reproduce:
+
+```bash
+pip install -r requirements-monitoring.txt
+python monitoring/drift_report.py
+```
+
 ## 🐳 Docker Setup (Inference API)
 The Stage 06 Inference API is fully containerized. You can run the live prediction service with a single command, without installing any Python dependencies locally.
 
@@ -182,7 +226,9 @@ used-car-price-intelligence-platform/
 |-- requirements.txt
 |-- README.md
 |-- run_all_stages.py
-|-- project_report.md
+|-- PROJECT_REPORT.md
+|-- requirements-monitoring.txt
+|-- export_champion.py
 |
 |-- data/
 |   |-- README.md
@@ -242,12 +288,20 @@ used-car-price-intelligence-platform/
 |   |-- README.md
 |   `-- stage7_data_validation.py
 |
-`-- 08-productionization/
-    |-- README.md
-    |-- stage8_productionization.py
-    `-- outputs/
-        |-- metrics/
-        `-- models/
+|-- 08-productionization/
+|    |-- README.md
+|    |-- stage8_productionization.py
+|    `-- outputs/
+|        |-- metrics/
+|        `-- models/
+|-- models/
+|   `-- champion/            # MLflow-format champion model
+|
+`-- monitoring/
+    |-- drift_report.py
+    |-- drift_report.html
+    |-- drift_summary.json
+    `-- screenshots/
 ```
 
 ## Methods and Evaluation
@@ -258,6 +312,7 @@ used-car-price-intelligence-platform/
 - Ensembling: weighted blending and stacking
 - Explainability: permutation importance for feature influence
 - Metrics: R2, RMSE, MAE, residual diagnostics
+- MLOps: MLflow experiment tracking and model registry; Evidently data-drift monitoring
 
 ## Data Flow
 
@@ -336,6 +391,14 @@ jupyter notebook
 
   Then run Stage 8 productionization:
    - `python 08-productionization/stage8_productionization.py`
+
+  Then run the data drift check (from the repo root; not part of `run_all_stages.py`):
+   - `pip install -r requirements-monitoring.txt`
+   - `python monitoring/drift_report.py`
+
+  Then browse the MLflow experiments (from the repo root):
+   - `mlflow ui --backend-store-uri sqlite:///mlflow.db`
+   - Open `http://127.0.0.1:5000`
 
   Then open one of these in the browser:
   - `http://127.0.0.1:8000/`
