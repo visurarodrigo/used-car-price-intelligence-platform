@@ -1,0 +1,120 @@
+{
+  "generated_at": "2026-09-20T20:20:26",
+  "reference_rows": 450,
+  "production_rows": 450,
+  "injected_features": [
+    "engine-size",
+    "curb-weight",
+    "horsepower"
+  ],
+  "n_features_tested": 15,
+  "n_drifted_features": 3,
+  "drift_share": 0.2,
+  "features": [
+    {
+      "feature": "engine-size",
+      "ks_stat": 0.3556,
+      "p_value": 0.0,
+      "drifted": true,
+      "injected": true
+    },
+    {
+      "feature": "curb-weight",
+      "ks_stat": 0.3244,
+      "p_value": 0.0,
+      "drifted": true,
+      "injected": true
+    },
+    {
+      "feature": "horsepower",
+      "ks_stat": 0.1889,
+      "p_value": 0.0,
+      "drifted": true,
+      "injected": true
+    },
+    {
+      "feature": "length",
+      "ks_stat": 0.0667,
+      "p_value": 0.27021,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "wheel-base",
+      "ks_stat": 0.06,
+      "p_value": 0.393084,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "width",
+      "ks_stat": 0.0578,
+      "p_value": 0.440763,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "height",
+      "ks_stat": 0.0489,
+      "p_value": 0.655841,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "compression-ratio",
+      "ks_stat": 0.0444,
+      "p_value": 0.766367,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "normalized-losses",
+      "ks_stat": 0.0378,
+      "p_value": 0.905604,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "peak-rpm",
+      "ks_stat": 0.0356,
+      "p_value": 0.93897,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "stroke",
+      "ks_stat": 0.0333,
+      "p_value": 0.96426,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "city-L/100km",
+      "ks_stat": 0.0311,
+      "p_value": 0.981602,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "bore",
+      "ks_stat": 0.0289,
+      "p_value": 0.992018,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "highway-mpg",
+      "ks_stat": 0.0289,
+      "p_value": 0.992018,
+      "drifted": false,
+      "injected": false
+    },
+    {
+      "feature": "city-mpg",
+      "ks_stat": 0.0244,
+      "p_value": 0.999314,
+      "drifted": false,
+      "injected": false
+    }
+  ]
+}
