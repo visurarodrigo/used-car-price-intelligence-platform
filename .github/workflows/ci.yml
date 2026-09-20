@@ -52,8 +52,8 @@ jobs:
         docker run -d -p 8000:8000 --name test-container used-car-api
         # Wait for the API and the fallback retraining to finish initialization
         sleep 15
-        # Test the health endpoint; if it fails, the build fails
-        curl -f http://localhost:8000/health || exit 1
+        # Test the health endpoint; if it fails, print logs and fail the build
+        curl -f http://localhost:8000/health || (docker logs test-container && exit 1)
         # Clean up the test container to leave the runner environment clean
         docker stop test-container
         docker rm test-container
